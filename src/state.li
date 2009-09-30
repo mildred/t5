@@ -1,0 +1,67 @@
+// Copyright (c) 2009 Mildred Ki'Lya <http://ki.lya.online.fr>
+//
+// Permission is hereby granted, free of charge, to any person
+// obtaining a copy of this software and associated documentation
+// files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use,
+// copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following
+// conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+// HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+// OTHER DEALINGS IN THE SOFTWARE.
+
+Section Header
+
+  + name := STATE;
+
+  - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
+  - copyright     := "2009 Mildred Ki'Lya";
+  - comment       := "";
+
+Section Inherit
+
+  + parent :Expanded OBJECT;
+
+Section Public
+
+  - read_token :TOKEN <- (not_yet_implemented; TOKEN);
+  - read_group :GROUP <- (not_yet_implemented; GROUP);
+
+  - output tk:TOKEN <- output_string (tk.output);
+
+  - output_string string:ABSTRACT_STRING <- not_yet_implemented;
+
+Section T5
+
+  - process in:INPUT_STREAM to out:OUTPUT_STREAM in stack:STACK <-
+  ( + tk:TOKEN;
+    + tk_idf:TOKEN.IDENTIFIER;
+    tk := read_token;
+    tk_idf ?= tk;
+    (tk_idf != NULL).if {
+      + macro:MACRO;
+      macro := stack.current.definitions.reference_at (tk_idf.name);
+      (macro != NULL).if {
+	macro.execute Self in stack;
+      } else {
+	output tk;
+      }
+    } else {
+      output tk;
+    };
+  );
+
+
+// kate: hl Lisaac v0.2; indent-width 2; space-indent on; replace-tabs off;
+// kate: tab-width 8; remove-trailing-space on;
