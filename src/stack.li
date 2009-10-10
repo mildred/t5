@@ -32,16 +32,21 @@ Section Header
 Section Inherit
 
   + parent_fast_array :FAST_ARRAY(STACK_FRAME) :=
-  (
+  ( + stack :FAST_ARRAY(STACK_FRAME);
     stack := FAST_ARRAY(STACK_FRAME).create_with_capacity 1;
     stack.add_last (STACK_FRAME.clone);
+    stack
   );
 
   + parent_clonable :Expanded CLONABLE;
 
 Section Public
 
-  - current :STACK_FRAME <- last;
+  - current :STACK_FRAME <-
+  ( + s :STACK_FRAME;
+    s := last ;
+    s
+  );
   - push s:STACK_FRAME <- add_last s;
   - pop <- remove_last;
 

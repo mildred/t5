@@ -39,7 +39,7 @@ Section Public
   ( + result :SELF;
     result := parent.clone;
     result.make_from Self;
-    result;
+    result
   );
 
 Section SELF
