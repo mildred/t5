@@ -23,7 +23,7 @@
 
 Section Header
 
-  + name := CHARACTER;
+  + name := TK_CHARACTER;
 
   - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
   - copyright     := "2009 Mildred Ki'Lya";
@@ -35,7 +35,7 @@ Section Inherit
 
 Section Public
 
-  - character :LIB...CHARACTER <- source.first;
+  - character :CHARACTER <- source.first;
 
   - make src:ABSTRACT_STRING :SELF <-
   [
