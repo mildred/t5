@@ -23,7 +23,7 @@
 
 Section Header
 
-  + name := IDENTIFIER;
+  + name := TK_COMMENT;
 
   - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
   - copyright     := "2009 Mildred Ki'Lya";
@@ -31,22 +31,11 @@ Section Header
 
 Section Inherit
 
-  + parent_token :Expanded TOKEN;
+  + parent_token :Expanded TOKEN := TOKEN;
 
 Section Public
 
-  + name :ABSTRACT_STRING;
-
-  - make src:ABSTRACT_STRING name n:ABSTRACT_STRING :SELF <-
-  (
-    parent_token.make src;
-    name := n;
-    Self
-  );
-
-Section SELF
-
-  - make_from origin:SELF;
+  - output :ABSTRACT_STRING <- "";
 
 // kate: hl Lisaac v0.2; indent-width 2; space-indent on; replace-tabs off;
 // kate: tab-width 8; remove-trailing-space on;

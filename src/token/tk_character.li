@@ -31,7 +31,7 @@ Section Header
 
 Section Inherit
 
-  + parent_token :Expanded TOKEN;
+  + parent_token :Expanded TOKEN := TOKEN;
 
 Section Public
 
@@ -48,7 +48,8 @@ Section Public
 
 Section SELF
 
-  - make_from origin:SELF;
+  - make_from origin:SELF <-
+    make (origin.source);
 
 // kate: hl Lisaac v0.2; indent-width 2; space-indent on; replace-tabs off;
 // kate: tab-width 8; remove-trailing-space on;

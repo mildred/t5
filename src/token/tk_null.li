@@ -23,36 +23,23 @@
 
 Section Header
 
-  + name := TOKEN;
+  + name := TK_NULL;
 
   - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
   - copyright     := "2009 Mildred Ki'Lya";
   - comment       := "";
 
-//   - default       := TK_NULL;
-
 Section Inherit
 
-  + parent :Expanded CLONABLE;
+  + parent_token :Expanded TOKEN;
 
 Section Public
 
-  + source :ABSTRACT_STRING;
+  - source :ABSTRACT_STRING <- "";
 
-  - output :ABSTRACT_STRING <- source;
-  
-  - is_null :BOOLEAN <- FALSE;
+  - output :ABSTRACT_STRING <- "";
 
-  - make src:ABSTRACT_STRING :SELF <-
-  (
-    source := src;
-    Self
-  );
-
-Section SELF
-
-  - make_from origin:SELF <-
-    make (origin.source);
+  - is_null :BOOLEAN <- TRUE;
 
 // kate: hl Lisaac v0.2; indent-width 2; space-indent on; replace-tabs off;
 // kate: tab-width 8; remove-trailing-space on;
