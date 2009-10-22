@@ -31,13 +31,13 @@ Section Header
 
 Section Inherit
 
-  + parent :Expanded OBJECT;
+  + parent_object :Expanded OBJECT;
 
 Section Public
 
   - clone :SELF <-
   ( + result :SELF;
-    result := parent.clone;
+    result := parent_object.clone;
     result.make_from Self;
     result
   );
