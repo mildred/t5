@@ -90,10 +90,21 @@ Section Public
         s := STRING.create 128;
         s.add_last c;
         in.read_line_in s;
-        {(!in.end_of_input) && {in.last_character.is_separator}}.while_do {
+        // Append \n not appended by `read_line_in'
+        (!in.end_of_input).if {
           s.add_last (in.last_character);
           in.read_character;
         };
+        // Append whitespaces except end of line
+        { (!in.end_of_input) &&
+          { (in.last_character = ' ') ||
+            {in.last_character = '\t'}
+          }
+        }.while_do {
+          s.add_last (in.last_character);
+          in.read_character;
+        };
+        // Unread last character that is not a space
         in.end_of_input.if_false {
           in.unread_character;
         };
