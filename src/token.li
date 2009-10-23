@@ -42,7 +42,9 @@ Section Public
   + source :ABSTRACT_STRING;
 
   - output :ABSTRACT_STRING <- source;
-  
+
+  - debug_output :ABSTRACT_STRING <- ( type + "<" + source + ">" );
+
   - is_null :BOOLEAN <- FALSE;
 
   - make src:ABSTRACT_STRING :SELF <-

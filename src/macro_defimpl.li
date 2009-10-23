@@ -44,6 +44,7 @@ Section Public
   - execute_reader reader:READER writer writer:WRITER_STACK stack stack:STACK <-
   (
     stack.push lexical_frame;
+    //"Process macro: ".print; content.debug_output.println;
     reader.process_token content writer writer stack stack;
     stack.pop;
   );
