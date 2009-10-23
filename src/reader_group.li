@@ -31,27 +31,26 @@ Section Header
 
 Section Inherit
 
-  + parent_reader :Expanded READER;
+  + parent_inherit_reader :Expanded READER;
 
-Section Public
+Section SELF
 
-  - read_token stack:STACK :TOKEN <-
-  (
+  - raw_read_token stack:STACK :TOKEN <-
+  ( + tk:TOKEN;
+
     (index <= group.tokens.upper).if {
-      last_token := group.tokens.item index;
+      tk := group.tokens.item index;
       index := index + 1;
-    } else {
-      last_token := NULL;
     };
 
-    last_token
+    tk
   );
+
+Section Public
 
   + group :TK_GROUP;
 
   + index :INTEGER;
-
-  + last_token :TOKEN;
 
   - make_group grp:TK_GROUP :SELF <-
   [
@@ -72,14 +71,11 @@ Section Public
     };
   );
 
-Section SELF
+Section CLONABLE
 
   - make_from origin:SELF <-
   (
-    (origin.group = NULL).if_false {
-      make_group (origin.group);
-    };
-    make_parent  (origin.parent);
-    last_token := origin.last_token;
+    parent_inherit_reader.make_from origin;
+    group      := origin.group;
     index      := origin.index;
   );

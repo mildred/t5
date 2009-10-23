@@ -31,21 +31,43 @@ Section Header
 
 Section Inherit
 
-  + parent_clonable :Expanded CLONABLE;
+  + parent_inherit_writer :Expanded WRITER;
+
+Section SELF
+
+  - raw_read_token stack:STACK :TOKEN <- (deferred; TOKEN);
+
+Section Private
+
+  + push_back :LINKED_LIST(TOKEN) := LINKED_LIST(TOKEN).create;
 
 Section Public
 
-  + parent :READER;
+  + parent_reader :READER;
 
-  - make_parent p:READER :SELF <-
+  - make_parent_reader p:READER :SELF <-
   (
-    parent := p;
+    parent_reader := p;
     Self
   );
 
-  - read_token stack:STACK :TOKEN <- (deferred; TOKEN);
+  - write_token token:TOKEN <-
+  (
+    push_back.add_last token;
+  );
 
-  - last_token :TOKEN <- (deferred; TOKEN);
+  - read_token stack:STACK :TOKEN <-
+  (
+    push_back.is_empty.if_false {
+      last_token := push_back.first;
+      push_back.remove_first;
+    } else {
+      last_token := raw_read_token stack;
+    };
+    last_token
+  );
+
+  + last_token :TOKEN;
 
   - process_token token:TOKEN writer writer:WRITER_STACK stack stack:STACK <-
   ( + tk_idf:TK_IDENTIFIER;
@@ -67,7 +89,7 @@ Section Public
       //
       // Read group (execute all elements)
       //
-      rd_grp := READER_GROUP.clone.make_group tk_grp.make_parent Self;
+      rd_grp := READER_GROUP.clone.make_group tk_grp.make_parent_reader Self;
       stack.push_copy;
       rd_grp.process_group stack writer writer;
       stack.pop;
@@ -78,4 +100,18 @@ Section Public
       writer.output token;
     };
   );
+
+Section CLONABLE
+
+  - make_from origin:SELF <-
+  (
+    parent_inherit_writer.make_from origin;
+    parent_reader := origin.parent_reader;
+    last_token    := origin.last_token;
+    push_back     := LINKED_LIST(TOKEN).create;
+    origin.push_back.foreach { tk:TOKEN;
+      push_back.add_last tk;
+    };
+  );
+
 

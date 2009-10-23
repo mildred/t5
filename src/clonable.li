@@ -42,7 +42,7 @@ Section Public
     result
   );
 
-Section SELF
+Section CLONABLE
 
   - make_from origin:SELF;
 

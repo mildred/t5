@@ -59,7 +59,7 @@ Section Public
     -? { w.parent = NULL };
   ]
   (
-    w.set_parent writer;
+    w.set_parent_writer writer;
     writer := w;
   )
   [

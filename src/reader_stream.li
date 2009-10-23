@@ -31,11 +31,11 @@ Section Header
 
 Section Inherit
 
-  + parent_reader :Expanded READER;
+  + parent_inherit_reader :Expanded READER;
 
-Section Public
+Section SELF
 
-  - read_token stack:STACK :TOKEN <-
+  - raw_read_token stack:STACK :TOKEN <-
   ( + in:INPUT_STREAM;
     + c:CHARACTER;
     + tk:TOKEN;
@@ -113,13 +113,12 @@ Section Public
       };
     };
 
-    last_token := tk;
     tk
   );
 
-  + input_stream :INPUT_STREAM;
+Section Public
 
-  + last_token :TOKEN;
+  + input_stream :INPUT_STREAM;
 
   - make_input in:INPUT_STREAM :SELF <-
   (
@@ -127,11 +126,10 @@ Section Public
     Self
   );
 
-Section SELF
+Section CLONABLE
 
   - make_from origin:SELF <-
   (
-    make_input  (origin.input_stream);
-    make_parent (origin.parent);
-    last_token := origin.last_token;
+    parent_inherit_reader.make_from origin;
+    input_stream := origin.input_stream;
   );

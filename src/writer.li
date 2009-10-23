@@ -35,11 +35,11 @@ Section Inherit
 
 Section Public
 
-  + parent :READER;
+  + parent_writer :WRITER;
 
-  - make_parent p:READER :SELF <-
+  - make_parent_writer p:WRITER :SELF <-
   (
-    parent := p;
+    parent_writer := p;
     Self
   );
 
@@ -47,7 +47,15 @@ Section Public
 
 Section WRITER_STACK
 
-  - set_parent w:WRITER <-
+  - set_parent_writer w:WRITER <-
   (
-    parent := w;
+    parent_writer := w;
+  );
+
+Section CLONABLE
+
+  - make_from origin:SELF <-
+  (
+    parent_clonable.make_from origin;
+    parent_writer := origin.parent_writer;
   );
