@@ -23,7 +23,7 @@
 
 Section Header
 
-  + name := NOP;
+  + name := MC_NOP;
 
   - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
   - copyright     := "2009 Mildred Ki'Lya";
@@ -37,8 +37,3 @@ Section Public
 
   + execute state:STATE; // nop
 
-
-
-
-// kate: hl Lisaac v0.2; indent-width 2; space-indent on; replace-tabs off;
-// kate: tab-width 8; remove-trailing-space on;
