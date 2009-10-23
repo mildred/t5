@@ -79,6 +79,7 @@ Section SELF
     (origin.group = NULL).if_false {
       make_group (origin.group);
     };
+    make_parent  (origin.parent);
     last_token := origin.last_token;
     index      := origin.index;
   );

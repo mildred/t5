@@ -31,9 +31,17 @@ Section Header
 
 Section Inherit
 
-  + parent :Expanded CLONABLE;
+  + parent_clonable :Expanded CLONABLE;
 
 Section Public
+
+  + parent :READER;
+
+  - make_parent p:READER :SELF <-
+  (
+    parent := p;
+    Self
+  );
 
   - read_token stack:STACK :TOKEN <- (deferred; TOKEN);
 
@@ -59,7 +67,7 @@ Section Public
       //
       // Read group (execute all elements)
       //
-      rd_grp := READER_GROUP.clone.make_group tk_grp;
+      rd_grp := READER_GROUP.clone.make_group tk_grp.make_parent Self;
       stack.push_copy;
       rd_grp.process_group stack;
       stack.pop;

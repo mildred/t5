@@ -62,7 +62,11 @@ Section SELF
 
   - make_from origin:SELF <-
   (
-    parent_fast_array := origin.parent_fast_array.clone;
+    parent_fast_array := FAST_ARRAY(STACK_FRAME).create_with_capacity
+      (origin.parent_fast_array.count);
+    origin.parent_fast_array.foreach { f:STACK_FRAME;
+      parent_fast_array.add_last f;
+    };
   );
 
 // kate: hl Lisaac v0.2; indent-width 2; space-indent on; replace-tabs off;

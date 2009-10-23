@@ -132,6 +132,7 @@ Section SELF
 
   - make_from origin:SELF <-
   (
-    make_input (origin.input_stream);
+    make_input  (origin.input_stream);
+    make_parent (origin.parent);
     last_token := origin.last_token;
   );
