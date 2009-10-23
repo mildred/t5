@@ -23,7 +23,7 @@
 
 Section Header
 
-  + name := TK_CHARACTER;
+  + name := TK_GROUP;
 
   - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
   - copyright     := "2009 Mildred Ki'Lya";
@@ -40,35 +40,51 @@ Section Private
 
 Section Public
 
-  - type :STRING_CONSTANT := "TK_CHARACTER";
+  - type :STRING_CONSTANT := "TK_GROUP";
 
-  + character :CHARACTER;
+  + start_character :CHARACTER;
+  + stop_character  :CHARACTER;
+
+  + tokens :FAST_ARRAY(TOKEN) :=
+    FAST_ARRAY(TOKEN).create 0;
 
   - source :ABSTRACT_STRING <-
-  ( + res :STRING;
-    res := dico_characters.fast_reference_at character;
-    (res = NULL).if {
-      res := STRING.create 1;
-      res.add_last character;
-      dico_characters.fast_put res to character;
+  ( + str:STRING;
+    str := STRING.create (tokens.count+2);
+    str.add_last start_character;
+    tokens.foreach { tk:TOKEN;
+      str.append (tk.source);
     };
-    res
-  )
-  [
-    +? { Result != NULL };
-  ];
+    str.add_last stop_character;
+    str
+  );
 
-  - make c:CHARACTER :SELF <-
+  - make (start, stop :CHARACTER) :SELF <-
   (
-    character := c;
+    start_character := start;
+    stop_character  := stop;
     Self
+  );
+
+  - install_in stack_frame:STACK_FRAME <-
+  ( + tk_end_group :TK_END_GROUP;
+    stack_frame.set_output_behaviour { tk:TOKEN;
+      tk_end_group ?= tk;
+      (tk_end_group != NULL).if {
+	stop_character := tk_end_group.character;
+      } else {
+	tokens.add_last tk;
+      };
+    };
   );
 
 Section SELF
 
   - make_from origin:SELF <-
   (
-    make (origin.character);
+    tokens := origin.tokens.clone;
+    start_character := origin.start_character;
+    stop_character  := origin.stop_character;
   );
 
 // kate: hl Lisaac v0.2; indent-width 2; space-indent on; replace-tabs off;

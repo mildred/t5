@@ -1,5 +1,5 @@
 This is a T5 test
-\def\test!
+\def\test{TeSt}
 \test
 
 Bye!

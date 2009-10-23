@@ -42,13 +42,21 @@ Section Inherit
 
 Section Public
 
-  - current :STACK_FRAME <-
-  ( + s :STACK_FRAME;
-    s := last ;
-    s
+  - current :STACK_FRAME <- last;
+
+  - pop <-
+  (
+    //"POP".println;
+    remove_last;
   );
-  - push s:STACK_FRAME <- add_last s;
-  - pop <- remove_last;
+
+  - push s:STACK_FRAME <-
+  (
+    //"PUSH".println;
+    add_last s;
+  );
+
+  - push_copy <- push (current.clone);
 
 Section SELF
 

@@ -35,6 +35,8 @@ Section Inherit
 
 Section Public
 
+  - type :STRING_CONSTANT := "TK_COMMENT";
+
   - output :ABSTRACT_STRING <- "";
 
 // kate: hl Lisaac v0.2; indent-width 2; space-indent on; replace-tabs off;

@@ -35,6 +35,8 @@ Section Inherit
 
 Section Public
 
+  - type :STRING_CONSTANT := "TK_IDENTIFIER";
+
   + name :ABSTRACT_STRING;
 
   - output :ABSTRACT_STRING <- name;

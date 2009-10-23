@@ -37,6 +37,8 @@ Section Inherit
 
 Section Public
 
+  - type :STRING_CONSTANT := "TOKEN";
+
   + source :ABSTRACT_STRING;
 
   - output :ABSTRACT_STRING <- source;

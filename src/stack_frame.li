@@ -47,7 +47,10 @@ Section Public
   + definitions :HASHED_DICTIONARY(MACRO,ABSTRACT_STRING) :=
     HASHED_DICTIONARY(MACRO,ABSTRACT_STRING).create;
 
-  - output token:TOKEN <- output_behaviour.value token;
+  - output token:TOKEN <-
+  (
+    output_behaviour.value token;
+  );
 
   - set_output_behaviour behaviour:{TOKEN;} <-
   (

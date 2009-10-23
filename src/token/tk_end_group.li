@@ -23,7 +23,7 @@
 
 Section Header
 
-  + name := TK_CHARACTER;
+  + name := TK_END_GROUP;
 
   - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
   - copyright     := "2009 Mildred Ki'Lya";
@@ -31,45 +31,11 @@ Section Header
 
 Section Inherit
 
-  + parent_token :Expanded TOKEN := TOKEN;
-
-Section Private
-
-  - dico_characters :HASHED_DICTIONARY(STRING,CHARACTER) :=
-    HASHED_DICTIONARY(STRING,CHARACTER).create;
+  + parent_tk_character :Expanded TK_CHARACTER := TK_CHARACTER;
 
 Section Public
 
-  - type :STRING_CONSTANT := "TK_CHARACTER";
-
-  + character :CHARACTER;
-
-  - source :ABSTRACT_STRING <-
-  ( + res :STRING;
-    res := dico_characters.fast_reference_at character;
-    (res = NULL).if {
-      res := STRING.create 1;
-      res.add_last character;
-      dico_characters.fast_put res to character;
-    };
-    res
-  )
-  [
-    +? { Result != NULL };
-  ];
-
-  - make c:CHARACTER :SELF <-
-  (
-    character := c;
-    Self
-  );
-
-Section SELF
-
-  - make_from origin:SELF <-
-  (
-    make (origin.character);
-  );
+  - type :STRING_CONSTANT := "TK_END_GROUP";
 
 // kate: hl Lisaac v0.2; indent-width 2; space-indent on; replace-tabs off;
 // kate: tab-width 8; remove-trailing-space on;
