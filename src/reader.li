@@ -67,7 +67,24 @@ Section Public
     last_token
   );
 
+  - cache_count :INTEGER <- push_back.count;
+
   + last_token :TOKEN;
+
+  - read_processed_token stack:STACK :TOKEN <-
+  ( + old_cache_count :INTEGER;
+    + result :TOKEN;
+    + writer :WRITER_STACK;
+
+    read_token stack;
+    old_cache_count := cache_count;
+    writer := WRITER_STACK.clone.make_writer Self;
+    process_token last_token writer writer stack stack;
+    (cache_count > old_cache_count).if {
+      result := read_token stack;
+    };
+    result
+  );
 
   - process_token token:TOKEN writer writer:WRITER_STACK stack stack:STACK <-
   ( + tk_idf:TK_IDENTIFIER;

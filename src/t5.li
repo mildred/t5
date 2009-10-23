@@ -53,6 +53,7 @@ Section Public
 
     stack.current.definitions.put MC_DEF to "def";
     stack.current.definitions.put MC_NOP to "nop";
+    stack.current.definitions.put MC_SET to "set";
 
     state := STATE.clone.make_reader reader writer writer stack stack;
     state.process;

@@ -23,7 +23,16 @@
 
 Section Header
 
-  + name := WRITER_STREAM;
+  + name := MC_SET;
+
+  // Usage: \set\idf\evaluatedContent
+  //
+  // If \idf is an identifier, \evaluatedContent is evaluated. If it results in
+  // no tokens, the macro \idf is unset, else the macro \idf is defined as a
+  // varaible containing the first result.
+  //
+  // Otherwise (\idf not an identifier), \def is outputted, \idf is processed
+  // and \evaluatedContent isn't even read
 
   - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
   - copyright     := "2009 Mildred Ki'Lya";
@@ -31,19 +40,31 @@ Section Header
 
 Section Inherit
 
-  + parent_inherit_writer :Expanded WRITER;
+  + parent :Expanded MACRO;
 
 Section Public
 
-  + stream :OUTPUT_STREAM;
+  - execute_reader reader:READER writer writer:WRITER_STACK stack stack:STACK <-
+  ( + idf, content :TOKEN;
+    + idf2 :TK_IDENTIFIER;
+    + mc :MACRO_VARIABLE;
 
-  - make_stream out:OUTPUT_STREAM :SELF <-
-  (
-    stream := out;
-    Self
+    idf2 ?= idf := reader.read_token stack;
+
+    (idf2 != NULL).if {
+
+      content := reader.read_processed_token stack;
+      (content = NULL).if {
+        stack.current.definitions.remove (idf2.name);
+      } else {
+        mc := MACRO_VARIABLE.clone.make_token content;
+        stack.current.definitions.put mc to (idf2.name);
+      };
+
+    } else {
+
+      reader.process_token idf writer writer stack stack;
+
+    };
   );
 
-  - write_token token:TOKEN <-
-  (
-    stream.put_string (token.output);
-  );

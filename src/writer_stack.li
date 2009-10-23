@@ -56,14 +56,14 @@ Section Public
   - push w:WRITER <-
   [
     -? { w != NULL };
-    -? { w.parent = NULL };
+    -? { w.parent_writer = NULL };
   ]
   (
     w.set_parent_writer writer;
     writer := w;
   )
   [
-    +? { writer.parent = Old writer };
+    +? { writer.parent_writer = Old writer };
   ];
 
   - pop :WRITER <-
@@ -72,10 +72,11 @@ Section Public
   ]
   ( + result :WRITER;
     result := writer;
-    writer := writer.parent;
+    writer := writer.parent_writer;
+    result.set_parent_writer NULL;
     result
   )
   [
     +? { Result = Old writer };
-    +? { writer = Old writer.parent };
+    +? { writer = Old writer.parent_writer };
   ];

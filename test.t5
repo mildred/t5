@@ -1,6 +1,13 @@
 This is a T5 test
 
 {
+  set var: \set\var{5}
+  use var: \var
+  unset var: \set\var\nop
+  use var: \var
+}
+
+{
   def toto: \def\toto{TOTO}
   def in group: \def\test{TeSt<\toto>}
   use in group: \test

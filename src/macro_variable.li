@@ -23,7 +23,7 @@
 
 Section Header
 
-  + name := WRITER_STREAM;
+  + name := MACRO_VARIABLE;
 
   - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
   - copyright     := "2009 Mildred Ki'Lya";
@@ -31,19 +31,21 @@ Section Header
 
 Section Inherit
 
-  + parent_inherit_writer :Expanded WRITER;
+  + parent :Expanded MACRO;
+
+Section Private
+
+  + content :TOKEN;
 
 Section Public
 
-  + stream :OUTPUT_STREAM;
-
-  - make_stream out:OUTPUT_STREAM :SELF <-
+  - execute_reader reader:READER writer writer:WRITER_STACK stack stack:STACK <-
   (
-    stream := out;
-    Self
+    writer.current.write_token content;
   );
 
-  - write_token token:TOKEN <-
+  - make_token tk:TOKEN :SELF <-
   (
-    stream.put_string (token.output);
+    content := tk;
+    Self
   );
