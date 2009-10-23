@@ -36,7 +36,12 @@ Section Inherit
 Section Public
 
   - main <-
-  (
+  ( + c:CLONABLE;
+    c := CLONABLE;
+    `/* @c */`;
+    // Force generation of CLONABLE_struct that is an alias of STACK_FRAME. If
+    // We don't have it, the C code generated is incorrect
+
     STATE.process STD_INPUT to STD_OUTPUT in STACK;
   );
 

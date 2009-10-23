@@ -47,7 +47,9 @@ Section Public
 Section SELF
 
   - make_from origin:SELF <-
+  (
     make (origin.source) name (origin.name);
+  );
 
 // kate: hl Lisaac v0.2; indent-width 2; space-indent on; replace-tabs off;
 // kate: tab-width 8; remove-trailing-space on;

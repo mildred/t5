@@ -46,41 +46,41 @@ Section Public
       (c = stack.current.char_escape).if {
         in.read_character;
         in.end_of_input.if {
-//           tk := TK_CHARACTER.clone.make (c.to_abstract_string);
+          tk := TK_CHARACTER.clone.make (c.to_abstract_string);
         } else {
-//           s := STRING.create 128;
-//           s.add_last c;
-//           s.add_last (in.last_character);
-//           in.last_character.is_identifier.if {
-//             in.read_character;
-//             {(!in.end_of_input) && {in.last_character.is_identifier}}.while_do {
-//               s.add_last (in.last_character);
-//               in.read_character;
-//             };
-//             in.end_of_input.if_false {
-//               in.unread_character;
-//             };
-//           };
-//           tk := TK_IDENTIFIER.clone.make (s) name (s.substring (s.lower+1) to (s.upper));
+          s := STRING.create 128;
+          s.add_last c;
+          s.add_last (in.last_character);
+          in.last_character.is_identifier.if {
+            in.read_character;
+            {(!in.end_of_input) && {in.last_character.is_identifier}}.while_do {
+              s.add_last (in.last_character);
+              in.read_character;
+            };
+            in.end_of_input.if_false {
+              in.unread_character;
+            };
+          };
+          tk := TK_IDENTIFIER.clone.make (s) name (s.substring (s.lower+1) to (s.upper));
         };
       }.elseif {c = stack.current.char_begin_group} then {
         not_yet_implemented;
       }.elseif {c = stack.current.char_end_group} then {
         not_yet_implemented;
       }.elseif {c = stack.current.char_comment} then {
-//         s := STRING.create 128;
-//         s.add_last c;
-//         in.read_line_in s;
-//         {(!in.end_of_input) && {in.last_character.is_separator}}.while_do {
-//           s.add_last (in.last_character);
-//           in.read_character;
-//         };
-//         in.end_of_input.if_false {
-//           in.unread_character;
-//         };
-//         tk := TK_COMMENT.clone.make (s);
+        s := STRING.create 128;
+        s.add_last c;
+        in.read_line_in s;
+        {(!in.end_of_input) && {in.last_character.is_separator}}.while_do {
+          s.add_last (in.last_character);
+          in.read_character;
+        };
+        in.end_of_input.if_false {
+          in.unread_character;
+        };
+        tk := TK_COMMENT.clone.make (s);
       } else {
-//         tk := TK_CHARACTER.clone.make (c.to_abstract_string);
+        tk := TK_CHARACTER.clone.make (c.to_abstract_string);
       };
     };
 
