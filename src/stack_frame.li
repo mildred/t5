@@ -47,6 +47,18 @@ Section Public
   + definitions :HASHED_DICTIONARY(MACRO,ABSTRACT_STRING) :=
     HASHED_DICTIONARY(MACRO,ABSTRACT_STRING).create;
 
+Section SELF
+
+  - make_from origin:SELF <-
+  (
+    definitions := HASHED_DICTIONARY(MACRO,ABSTRACT_STRING).create;
+    origin.definitions.foreach_pair { (k:ABSTRACT_STRING, v:MACRO);
+      definitions.put v to k;
+    };
+  );
+
+Section Public
+
   - output token:TOKEN <-
   (
     output_behaviour.value token;
@@ -55,13 +67,6 @@ Section Public
   - set_output_behaviour behaviour:{TOKEN;} <-
   (
     output_behaviour := behaviour;
-  );
-
-Section Private
-
-  - make_from origin:SELF <-
-  (
-    definitions := origin.definitions.clone;
   );
 
 

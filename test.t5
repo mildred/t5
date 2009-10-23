@@ -1,6 +1,12 @@
 This is a T5 test
 {
-  def in group: \def\test{TeSt}
+  def toto: \def\toto{TOTO}
+  def in group: \def\test{TeSt<\toto>}
+  use in group: \test
+  {
+    def toto in subgroup: \def\toto{TATA}
+    use test in subgroup: \test 
+  }
   use in group: \test
 }
 use out of group: \test
