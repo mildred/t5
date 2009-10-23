@@ -31,43 +31,39 @@ Section Header
 
 Section Inherit
 
-  + parent_fast_array :FAST_ARRAY(STACK_FRAME) :=
+  + parent_clonable :Expanded CLONABLE;
+
+Section Private
+
+  + frames :FAST_ARRAY(STACK_FRAME) :=
   ( + stack :FAST_ARRAY(STACK_FRAME);
     stack := FAST_ARRAY(STACK_FRAME).create_with_capacity 1;
     stack.add_last (STACK_FRAME.clone);
     stack
   );
 
-  + parent_clonable :Expanded CLONABLE;
-
 Section Public
 
-  - current :STACK_FRAME <- last;
+  - current :STACK_FRAME <- frames.last;
 
-  - pop <-
-  (
-    //"POP".println;
-    remove_last;
+  - push s:STACK_FRAME   <- frames.add_last s;
+
+  - push_copy            <- push (current.clone);
+
+  - pop     :STACK_FRAME <-
+  ( + result :STACK_FRAME;
+    result := current;
+    frames.remove_last;
+    result
   );
-
-  - push s:STACK_FRAME <-
-  (
-    //"PUSH".println;
-    add_last s;
-  );
-
-  - push_copy <- push (current.clone);
 
 Section SELF
 
   - make_from origin:SELF <-
   (
-    parent_fast_array := FAST_ARRAY(STACK_FRAME).create_with_capacity
-      (origin.parent_fast_array.count);
-    origin.parent_fast_array.foreach { f:STACK_FRAME;
-      parent_fast_array.add_last f;
+    frames := FAST_ARRAY(STACK_FRAME).create_with_capacity
+      (origin.frames.count);
+    origin.frames.foreach { f:STACK_FRAME;
+      frames.add_last f;
     };
   );
-
-// kate: hl Lisaac v0.2; indent-width 2; space-indent on; replace-tabs off;
-// kate: tab-width 8; remove-trailing-space on;

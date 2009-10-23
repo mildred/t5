@@ -31,7 +31,7 @@ Section Header
 
 Section Inherit
 
-  + parent :Expanded READER;
+  + parent_reader :Expanded READER;
 
 Section Public
 
@@ -63,12 +63,12 @@ Section Public
     Self
   );
 
-  - process_group stack:STACK <-
+  - process_group stack:STACK writer writer:WRITER_STACK <-
   (
     read_token stack;
     (last_token != NULL).if {
-      process_token last_token stack stack;
-      process_group stack;
+      process_token last_token writer writer stack stack;
+      process_group stack writer writer;
     };
   );
 

@@ -31,7 +31,7 @@ Section Header
 
 Section Inherit
 
-  + parent :Expanded READER;
+  + parent_reader :Expanded READER;
 
 Section Public
 
@@ -71,10 +71,9 @@ Section Public
         tk_grp := TK_GROUP.clone.make (stack.current.char_begin_group,
                                        stack.current.char_end_group);
         stack.push_copy;
-        tk_grp.install_in (stack.current);
         tk := read_token stack;
         {tk != NULL}.while_do {
-          stack.current.output tk;
+          tk_grp.write_token tk;
           ((tk_end_grp ?= tk) != NULL).if {
             // end group, stop loop
             tk := NULL;

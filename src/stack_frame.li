@@ -33,10 +33,6 @@ Section Inherit
 
   + parent :Expanded CLONABLE;
 
-Section Private
-
-  + output_behaviour :{TOKEN;} := { tk:TOKEN; };
-
 Section Public
 
   + char_escape :CHARACTER := '\\';
@@ -57,19 +53,3 @@ Section SELF
     };
   );
 
-Section Public
-
-  - output token:TOKEN <-
-  (
-    output_behaviour.value token;
-  );
-
-  - set_output_behaviour behaviour:{TOKEN;} <-
-  (
-    output_behaviour := behaviour;
-  );
-
-
-
-// kate: hl Lisaac v0.2; indent-width 2; space-indent on; replace-tabs off;
-// kate: tab-width 8; remove-trailing-space on;

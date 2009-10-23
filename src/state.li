@@ -37,20 +37,26 @@ Section Public
 
   + reader :READER;
 
+  + writer :WRITER_STACK;
+
   + stack  :STACK;
 
-  - make_reader rd:READER stack s:STACK :SELF <-
+  - make_reader rd:READER writer_stack wr:WRITER_STACK stack s:STACK :SELF <-
   (
     reader := rd;
+    writer := wr;
     stack  := s;
     Self
   );
+
+  - make_reader rd:READER writer wr:WRITER stack s:STACK :SELF <-
+    make_reader rd writer_stack (WRITER_STACK.clone.make_writer wr) stack s;
 
 Section SELF
 
   - make_from origin:SELF <-
   (
-    make_reader (origin.reader) stack (origin.stack);
+    make_reader (origin.reader) writer_stack (origin.writer) stack (origin.stack);
   );
 
 Section T5
@@ -59,7 +65,7 @@ Section T5
   ( + token :TOKEN;
     token := reader.read_token stack;
     (token != NULL).if {
-      reader.process_token token stack stack;
+      reader.process_token token writer writer stack stack;
       process;
     };
   );

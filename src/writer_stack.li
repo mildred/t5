@@ -23,15 +23,7 @@
 
 Section Header
 
-  + name := MC_DEF;
-
-  // Usage: \def\idf\content
-  //
-  // If \idf is an identifier, a macro is defined for the current context that
-  // would evaluate \content each time it is called.
-  //
-  // Otherwise, \def is outputted, \idf is processed and \content isn't even
-  // read
+  + name := WRITER_STACK;
 
   - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
   - copyright     := "2009 Mildred Ki'Lya";
@@ -39,23 +31,51 @@ Section Header
 
 Section Inherit
 
-  + parent :Expanded MACRO;
+  + parent_clonable :Expanded CLONABLE;
 
 Section Public
 
-  - execute_reader reader:READER writer writer:WRITER_STACK stack stack:STACK <-
-  ( + idf, content :TOKEN;
-    + idf2 :TK_IDENTIFIER;
-    + mc :MACRO_DEFIMPL;
+  + writer :WRITER;
 
-    idf2 ?= idf := reader.read_token stack;
-
-    (idf2 != NULL).if {
-      content := reader.read_token stack;
-      mc := MACRO_DEFIMPL.clone.make_frame (stack.current) token content;
-      stack.current.definitions.put mc to (idf2.name);
-    } else {
-      reader.process_token idf writer writer stack stack;
-    };
+  - make_writer w:WRITER :SELF <-
+  (
+    writer := w;
+    Self
   );
 
+  - current :WRITER <- writer;
+
+  - output token:TOKEN <-
+  [
+    -? {current != NULL };
+  ]
+  (
+    current.write_token token
+  );
+
+  - push w:WRITER <-
+  [
+    -? { w != NULL };
+    -? { w.parent = NULL };
+  ]
+  (
+    w.set_parent writer;
+    writer := w;
+  )
+  [
+    +? { writer.parent = Old writer };
+  ];
+
+  - pop :WRITER <-
+  [
+    -? { writer != NULL };
+  ]
+  ( + result :WRITER;
+    result := writer;
+    writer := writer.parent;
+    result
+  )
+  [
+    +? { Result = Old writer };
+    +? { writer = Old writer.parent };
+  ];

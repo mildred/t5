@@ -38,6 +38,7 @@ Section Public
   - main <-
   ( + state :STATE;
     + reader:READER;
+    + writer:WRITER;
     + stack :STACK;
 
     + c:CLONABLE;
@@ -45,14 +46,14 @@ Section Public
     `/* @c */`;
     // Force generation of CLONABLE_struct that is an alias of STACK_FRAME. If
     // We don't have it, the C code generated is incorrect
-
-    stack := STACK.clone;
-    stack.current.set_output_behaviour { tk:TOKEN;
-      STD_OUTPUT.put_string (tk.output);
-    };
-    stack.current.definitions.put MC_DEF to "def";
+    
     reader := READER_STREAM.clone.make_input STD_INPUT;
-    state := STATE.clone.make_reader reader stack stack;
+    writer := WRITER_STREAM.clone.make_stream STD_OUTPUT;
+    stack := STACK.clone;
+
+    stack.current.definitions.put MC_DEF to "def";
+
+    state := STATE.clone.make_reader reader writer writer stack stack;
     state.process;
   );
 

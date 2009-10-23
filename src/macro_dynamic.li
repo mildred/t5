@@ -35,16 +35,16 @@ Section Inherit
 
 Section Private
 
-  + behaviour :{READER,STACK;};
+  + behaviour :{READER,WRITER_STACK,STACK;};
 
 Section Public
 
-  - execute reader:READER stack stack:STACK <-
+  - execute_reader reader:READER writer writer:WRITER_STACK stack stack:STACK <-
   (
-    behaviour.value (reader,stack);
+    behaviour.value (reader,writer,stack);
   );
 
-  - make b:{READER,STACK;} :SELF <-
+  - make b:{READER,WRITER_STACK,STACK;} :SELF <-
   (
     behaviour := b;
     Self

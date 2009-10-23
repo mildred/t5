@@ -41,10 +41,10 @@ Section Private
 
 Section Public
 
-  - execute reader:READER stack stack:STACK <-
+  - execute_reader reader:READER writer writer:WRITER_STACK stack stack:STACK <-
   (
     stack.push lexical_frame;
-    reader.process_token content stack stack;
+    reader.process_token content writer writer stack stack;
     stack.pop;
   );
 

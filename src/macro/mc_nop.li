@@ -35,5 +35,5 @@ Section Inherit
 
 Section Public
 
-  - execute reader:READER stack stack:STACK; // nop
+  - execute_reader reader:READER writer writer:WRITER_STACK stack stack:STACK; // nop
 

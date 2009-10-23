@@ -33,6 +33,8 @@ Section Inherit
 
   + parent_token :Expanded TOKEN := TOKEN;
 
+  + parent_writer :Expanded WRITER := WRITER;
+
 Section Private
 
   - dico_characters :HASHED_DICTIONARY(STRING,CHARACTER) :=
@@ -75,15 +77,13 @@ Section Public
     Self
   );
 
-  - install_in stack_frame:STACK_FRAME <-
+  - write_token token:TOKEN <-
   ( + tk_end_group :TK_END_GROUP;
-    stack_frame.set_output_behaviour { tk:TOKEN;
-      tk_end_group ?= tk;
-      (tk_end_group != NULL).if {
-	stop_character := tk_end_group.character;
-      } else {
-	tokens.add_last tk;
-      };
+    tk_end_group ?= token;
+    (tk_end_group != NULL).if {
+      stop_character := tk_end_group.character;
+    } else {
+      tokens.add_last token;
     };
   );
 

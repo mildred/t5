@@ -47,7 +47,7 @@ Section Public
 
   - last_token :TOKEN <- (deferred; TOKEN);
 
-  - process_token token:TOKEN stack stack:STACK <-
+  - process_token token:TOKEN writer writer:WRITER_STACK stack stack:STACK <-
   ( + tk_idf:TK_IDENTIFIER;
     + tk_grp:TK_GROUP;
     + rd_grp:READER_GROUP;
@@ -59,9 +59,9 @@ Section Public
       //
       macro := stack.current.definitions.reference_at (tk_idf.name);
       (macro != NULL).if {
-        macro.execute Self stack stack;
+        macro.execute_reader Self writer writer stack stack;
       } else {
-        stack.current.output token;
+        writer.output token;
       }
     }.elseif {(tk_grp ?= token) != NULL} then {
       //
@@ -69,13 +69,13 @@ Section Public
       //
       rd_grp := READER_GROUP.clone.make_group tk_grp.make_parent Self;
       stack.push_copy;
-      rd_grp.process_group stack;
+      rd_grp.process_group stack writer writer;
       stack.pop;
     } else {
       //
       // Read any other token and output it directly
       //
-      stack.current.output token;
+      writer.output token;
     };
   );
 

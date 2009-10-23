@@ -23,15 +23,7 @@
 
 Section Header
 
-  + name := MC_DEF;
-
-  // Usage: \def\idf\content
-  //
-  // If \idf is an identifier, a macro is defined for the current context that
-  // would evaluate \content each time it is called.
-  //
-  // Otherwise, \def is outputted, \idf is processed and \content isn't even
-  // read
+  + name := WRITER_STREAM;
 
   - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
   - copyright     := "2009 Mildred Ki'Lya";
@@ -39,23 +31,19 @@ Section Header
 
 Section Inherit
 
-  + parent :Expanded MACRO;
+  + parent_writer :Expanded WRITER;
 
 Section Public
 
-  - execute_reader reader:READER writer writer:WRITER_STACK stack stack:STACK <-
-  ( + idf, content :TOKEN;
-    + idf2 :TK_IDENTIFIER;
-    + mc :MACRO_DEFIMPL;
+  + stream :OUTPUT_STREAM;
 
-    idf2 ?= idf := reader.read_token stack;
-
-    (idf2 != NULL).if {
-      content := reader.read_token stack;
-      mc := MACRO_DEFIMPL.clone.make_frame (stack.current) token content;
-      stack.current.definitions.put mc to (idf2.name);
-    } else {
-      reader.process_token idf writer writer stack stack;
-    };
+  - make_stream out:OUTPUT_STREAM :SELF <-
+  (
+    stream := out;
+    Self
   );
 
+  - write_token token:TOKEN <-
+  (
+    stream.put_string (token.output);
+  );
