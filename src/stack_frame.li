@@ -33,6 +33,10 @@ Section Inherit
 
   + parent :Expanded CLONABLE;
 
+Section Private
+
+  + output_behaviour :{TOKEN;} := { tk:TOKEN; };
+
 Section Public
 
   + char_escape :CHARACTER := '\\';
@@ -40,7 +44,15 @@ Section Public
   + char_end_group :CHARACTER := '}';
   + char_comment :CHARACTER := '%';
 
-  + definitions :HASHED_DICTIONARY(MACRO,ABSTRACT_STRING);
+  + definitions :HASHED_DICTIONARY(MACRO,ABSTRACT_STRING) :=
+    HASHED_DICTIONARY(MACRO,ABSTRACT_STRING).create;
+
+  - output token:TOKEN <- output_behaviour.value token;
+
+  - set_output_behaviour behaviour:{TOKEN;} <-
+  (
+    output_behaviour := behaviour;
+  );
 
 Section Private
 

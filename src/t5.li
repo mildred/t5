@@ -42,7 +42,10 @@ Section Public
     // Force generation of CLONABLE_struct that is an alias of STACK_FRAME. If
     // We don't have it, the C code generated is incorrect
 
-    STATE.process STD_INPUT to STD_OUTPUT in STACK;
+    STACK.current.set_output_behaviour { tk:TOKEN;
+      STD_OUTPUT.put_string (tk.output);
+    };
+    STATE.process STD_INPUT in STACK;
   );
 
 

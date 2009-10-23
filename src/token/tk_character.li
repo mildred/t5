@@ -33,16 +33,32 @@ Section Inherit
 
   + parent_token :Expanded TOKEN := TOKEN;
 
+Section Private
+
+  - dico_characters :HASHED_DICTIONARY(STRING,CHARACTER) :=
+    HASHED_DICTIONARY(STRING,CHARACTER).create;
+
 Section Public
 
-  - character :CHARACTER <- source.first;
+  + character :CHARACTER;
 
-  - make src:ABSTRACT_STRING :SELF <-
+  - source :ABSTRACT_STRING <-
+  ( + res :STRING;
+    res := dico_characters.fast_reference_at character;
+    (res = NULL).if {
+      res := STRING.create 1;
+      res.add_last character;
+      dico_characters.fast_put res to character;
+    };
+    res
+  )
   [
-    -? { src.count = 1 };
-  ]
+    +? { Result != NULL };
+  ];
+
+  - make c:CHARACTER :SELF <-
   (
-    parent_token.make src;
+    character := c;
     Self
   );
 
@@ -50,7 +66,7 @@ Section SELF
 
   - make_from origin:SELF <-
   (
-    make (origin.source);
+    make (origin.character);
   );
 
 // kate: hl Lisaac v0.2; indent-width 2; space-indent on; replace-tabs off;

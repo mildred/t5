@@ -46,7 +46,7 @@ Section Public
       (c = stack.current.char_escape).if {
         in.read_character;
         in.end_of_input.if {
-          tk := TK_CHARACTER.clone.make (c.to_abstract_string);
+          tk := TK_CHARACTER.clone.make (c);
         } else {
           s := STRING.create 128;
           s.add_last c;
@@ -80,7 +80,7 @@ Section Public
         };
         tk := TK_COMMENT.clone.make (s);
       } else {
-        tk := TK_CHARACTER.clone.make (c.to_abstract_string);
+        tk := TK_CHARACTER.clone.make (c);
       };
     };
 
@@ -89,13 +89,9 @@ Section Public
 
   - read_group_from in:INPUT_STREAM :GROUP <- (not_yet_implemented; GROUP);
 
-  - output tk:TOKEN <- output_string (tk.output);
-
-  - output_string string:ABSTRACT_STRING <- not_yet_implemented;
-
 Section T5
 
-  - process in:INPUT_STREAM to out:OUTPUT_STREAM in stack:STACK <-
+  - process in:INPUT_STREAM in stack:STACK <-
   ( + tk:TOKEN;
     + tk_idf:TK_IDENTIFIER;
     tk := read_token_from in in stack;
@@ -103,15 +99,25 @@ Section T5
       tk_idf ?= tk;
       (tk_idf != NULL).if {
         + macro:MACRO;
+        //
+        // Read identifier (execute macro)
+        //
         macro := stack.current.definitions.reference_at (tk_idf.name);
         (macro != NULL).if {
           macro.execute Self in stack;
         } else {
-          output tk;
+          stack.current.output tk;
         }
       } else {
-        output tk;
+        //
+        // Read any other token and output it directly
+        //
+        stack.current.output tk;
       };
+      //
+      // Recursion
+      //
+      process in in stack;
     };
   );
 
