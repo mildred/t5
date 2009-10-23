@@ -59,6 +59,15 @@ Section Public
     str
   );
 
+  - output :ABSTRACT_STRING <-
+  ( + str:STRING;
+    str := STRING.create (tokens.count+2);
+    tokens.foreach { tk:TOKEN;
+      str.append (tk.output);
+    };
+    str
+  );
+
   - make (start, stop :CHARACTER) :SELF <-
   (
     start_character := start;
@@ -87,5 +96,3 @@ Section SELF
     stop_character  := origin.stop_character;
   );
 
-// kate: hl Lisaac v0.2; indent-width 2; space-indent on; replace-tabs off;
-// kate: tab-width 8; remove-trailing-space on;

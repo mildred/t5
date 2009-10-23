@@ -36,8 +36,9 @@ Section Inherit
 Section Public
 
   - main <-
-  ( + state:STATE;
-    + stack:STACK;
+  ( + state :STATE;
+    + reader:READER;
+    + stack :STACK;
 
     + c:CLONABLE;
     c := CLONABLE;
@@ -50,7 +51,8 @@ Section Public
       STD_OUTPUT.put_string (tk.output);
     };
     stack.current.definitions.put MC_DEF to "def";
-    state := STATE.clone.make_input STD_INPUT stack stack;
+    reader := READER_STREAM.clone.make_input STD_INPUT;
+    state := STATE.clone.make_reader reader stack stack;
     state.process;
   );
 

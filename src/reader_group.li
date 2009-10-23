@@ -23,15 +23,7 @@
 
 Section Header
 
-  + name := MC_DEF;
-
-  // Usage: \def\idf\content
-  //
-  // If \idf is an identifier, a macro is defined for the current context that
-  // would evaluate \content each time it is called.
-  //
-  // Otherwise, \def is outputted, \idf is processed and \content isn't even
-  // read
+  + name := READER_GROUP;
 
   - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
   - copyright     := "2009 Mildred Ki'Lya";
@@ -39,27 +31,54 @@ Section Header
 
 Section Inherit
 
-  + parent :Expanded MACRO;
+  + parent :Expanded READER;
 
 Section Public
 
-  - execute reader:READER stack stack:STACK <-
-  ( + idf, content :TOKEN;
-    + idf2 :TK_IDENTIFIER;
-    + mc :MACRO_DEFIMPL;
-
-    //reader.last_token.type.print; " '".print; reader.last_token.source.print; "'\n".println;
-
-    idf2 ?= idf := reader.read_token stack;
-
-    //idf.type.print; " '".print; idf.source.print; "'\n".println;
-
-    (idf2 != NULL).if {
-      content := reader.read_token stack;
-      mc := MACRO_DEFIMPL.clone.make_frame (stack.current) token content;
-      stack.current.definitions.put mc to (idf2.name);
+  - read_token stack:STACK :TOKEN <-
+  (
+    (index <= group.tokens.upper).if {
+      last_token := group.tokens.item index;
+      index := index + 1;
     } else {
-      reader.process_token idf stack stack;
+      last_token := NULL;
+    };
+
+    last_token
+  );
+
+  + group :TK_GROUP;
+
+  + index :INTEGER;
+
+  + last_token :TOKEN;
+
+  - make_group grp:TK_GROUP :SELF <-
+  [
+    -? { grp != NULL };
+  ]
+  (
+    group := grp;
+    index := grp.tokens.lower;
+    Self
+  );
+
+  - process_group stack:STACK <-
+  (
+    read_token stack;
+    (last_token != NULL).if {
+      process_token last_token stack stack;
+      process_group stack;
     };
   );
 
+Section SELF
+
+  - make_from origin:SELF <-
+  (
+    (origin.group = NULL).if_false {
+      make_group (origin.group);
+    };
+    last_token := origin.last_token;
+    index      := origin.index;
+  );

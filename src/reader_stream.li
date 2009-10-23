@@ -1,0 +1,137 @@
+// Copyright (c) 2009 Mildred Ki'Lya <http://ki.lya.online.fr>
+//
+// Permission is hereby granted, free of charge, to any person
+// obtaining a copy of this software and associated documentation
+// files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use,
+// copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following
+// conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+// HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+// OTHER DEALINGS IN THE SOFTWARE.
+
+Section Header
+
+  + name := READER_STREAM;
+
+  - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
+  - copyright     := "2009 Mildred Ki'Lya";
+  - comment       := "";
+
+Section Inherit
+
+  + parent :Expanded READER;
+
+Section Public
+
+  - read_token stack:STACK :TOKEN <-
+  ( + in:INPUT_STREAM;
+    + c:CHARACTER;
+    + tk:TOKEN;
+    + tk_grp:TK_GROUP;
+    + tk_end_grp:TK_END_GROUP;
+    + s:STRING;
+    in := input_stream;
+    in.read_character;
+
+    in.end_of_input.if_false {
+      c := in.last_character;
+      (c = stack.current.char_escape).if {
+        in.read_character;
+        in.end_of_input.if {
+          tk := TK_CHARACTER.clone.make (c);
+        } else {
+          s := STRING.create 128;
+          s.add_last c;
+          s.add_last (in.last_character);
+          in.last_character.is_identifier.if {
+            in.read_character;
+            {(!in.end_of_input) && {in.last_character.is_identifier}}.while_do {
+              s.add_last (in.last_character);
+              in.read_character;
+            };
+            in.end_of_input.if_false {
+              in.unread_character;
+            };
+          };
+          tk := TK_IDENTIFIER.clone.make (s) name (s.substring (s.lower+1) to (s.upper));
+        };
+      }.elseif {c = stack.current.char_begin_group} then {
+        tk_grp := TK_GROUP.clone.make (stack.current.char_begin_group,
+                                       stack.current.char_end_group);
+        stack.push_copy;
+        tk_grp.install_in (stack.current);
+        tk := read_token stack;
+        {tk != NULL}.while_do {
+          stack.current.output tk;
+          ((tk_end_grp ?= tk) != NULL).if {
+            // end group, stop loop
+            tk := NULL;
+          } else {
+            tk := read_token stack;
+          };
+        };
+        stack.pop;
+        tk := tk_grp;
+      }.elseif {c = stack.current.char_end_group} then {
+        tk := TK_END_GROUP.clone.make c;
+      }.elseif {c = stack.current.char_comment} then {
+        s := STRING.create 128;
+        s.add_last c;
+        in.read_line_in s;
+        // Append \n not appended by `read_line_in'
+        (!in.end_of_input).if {
+          s.add_last (in.last_character);
+          in.read_character;
+        };
+        // Append whitespaces except end of line
+        { (!in.end_of_input) &&
+          { (in.last_character = ' ') ||
+            {in.last_character = '\t'}
+          }
+        }.while_do {
+          s.add_last (in.last_character);
+          in.read_character;
+        };
+        // Unread last character that is not a space
+        in.end_of_input.if_false {
+          in.unread_character;
+        };
+        tk := TK_COMMENT.clone.make (s);
+      } else {
+        tk := TK_CHARACTER.clone.make (c);
+      };
+    };
+
+    last_token := tk;
+    tk
+  );
+
+  + input_stream :INPUT_STREAM;
+
+  + last_token :TOKEN;
+
+  - make_input in:INPUT_STREAM :SELF <-
+  (
+    input_stream := in;
+    Self
+  );
+
+Section SELF
+
+  - make_from origin:SELF <-
+  (
+    make_input (origin.input_stream);
+    last_token := origin.last_token;
+  );

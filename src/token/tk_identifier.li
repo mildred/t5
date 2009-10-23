@@ -39,7 +39,7 @@ Section Public
 
   + name :ABSTRACT_STRING;
 
-  - output :ABSTRACT_STRING <- name;
+  //- output :ABSTRACT_STRING <- name;
 
   - make src:ABSTRACT_STRING name n:ABSTRACT_STRING :SELF <-
   (

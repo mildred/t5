@@ -23,15 +23,7 @@
 
 Section Header
 
-  + name := MC_DEF;
-
-  // Usage: \def\idf\content
-  //
-  // If \idf is an identifier, a macro is defined for the current context that
-  // would evaluate \content each time it is called.
-  //
-  // Otherwise, \def is outputted, \idf is processed and \content isn't even
-  // read
+  + name := READER;
 
   - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
   - copyright     := "2009 Mildred Ki'Lya";
@@ -39,27 +31,43 @@ Section Header
 
 Section Inherit
 
-  + parent :Expanded MACRO;
+  + parent :Expanded CLONABLE;
 
 Section Public
 
-  - execute reader:READER stack stack:STACK <-
-  ( + idf, content :TOKEN;
-    + idf2 :TK_IDENTIFIER;
-    + mc :MACRO_DEFIMPL;
+  - read_token stack:STACK :TOKEN <- (deferred; TOKEN);
 
-    //reader.last_token.type.print; " '".print; reader.last_token.source.print; "'\n".println;
+  - last_token :TOKEN <- (deferred; TOKEN);
 
-    idf2 ?= idf := reader.read_token stack;
+  - process_token token:TOKEN stack stack:STACK <-
+  ( + tk_idf:TK_IDENTIFIER;
+    + tk_grp:TK_GROUP;
+    + rd_grp:READER_GROUP;
 
-    //idf.type.print; " '".print; idf.source.print; "'\n".println;
-
-    (idf2 != NULL).if {
-      content := reader.read_token stack;
-      mc := MACRO_DEFIMPL.clone.make_frame (stack.current) token content;
-      stack.current.definitions.put mc to (idf2.name);
+    ((tk_idf ?= token) != NULL).if {
+      + macro:MACRO;
+      //
+      // Read identifier (execute macro)
+      //
+      macro := stack.current.definitions.reference_at (tk_idf.name);
+      (macro != NULL).if {
+        macro.execute Self stack stack;
+      } else {
+        stack.current.output token;
+      }
+    }.elseif {(tk_grp ?= token) != NULL} then {
+      //
+      // Read group (execute all elements)
+      //
+      rd_grp := READER_GROUP.clone.make_group tk_grp;
+      stack.push_copy;
+      rd_grp.process_group stack;
+      stack.pop;
     } else {
-      reader.process_token idf stack stack;
+      //
+      // Read any other token and output it directly
+      //
+      stack.current.output token;
     };
   );
 

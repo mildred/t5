@@ -1,6 +1,9 @@
 This is a T5 test
-\def\test{TeSt}%
-\test
+{
+  def in group: \def\test{TeSt}
+  use in group: \test
+}
+use out of group: \test
 
 % comment
 

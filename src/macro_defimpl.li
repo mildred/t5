@@ -41,11 +41,11 @@ Section Private
 
 Section Public
 
-  - execute state:STATE <-
+  - execute reader:READER stack stack:STACK <-
   (
-    state.stack.push lexical_frame;
-    state.process_token content;
-    state.stack.pop;
+    stack.push lexical_frame;
+    reader.process_token content stack stack;
+    stack.pop;
   );
 
   - make_frame frame:STACK_FRAME token tk:TOKEN :SELF <-

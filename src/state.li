@@ -35,98 +35,14 @@ Section Inherit
 
 Section Public
 
-  - read_token :TOKEN <-
-  ( + in:INPUT_STREAM;
-    + c:CHARACTER;
-    + tk:TOKEN;
-    + tk_grp:TK_GROUP;
-    + tk_end_grp:TK_END_GROUP;
-    + s:STRING;
-    in := input_stream;
-    in.read_character;
+  + reader :READER;
 
-    in.end_of_input.if_false {
-      c := in.last_character;
-      (c = stack.current.char_escape).if {
-        in.read_character;
-        in.end_of_input.if {
-          tk := TK_CHARACTER.clone.make (c);
-        } else {
-          s := STRING.create 128;
-          s.add_last c;
-          s.add_last (in.last_character);
-          in.last_character.is_identifier.if {
-            in.read_character;
-            {(!in.end_of_input) && {in.last_character.is_identifier}}.while_do {
-              s.add_last (in.last_character);
-              in.read_character;
-            };
-            in.end_of_input.if_false {
-              in.unread_character;
-            };
-          };
-          tk := TK_IDENTIFIER.clone.make (s) name (s.substring (s.lower+1) to (s.upper));
-        };
-      }.elseif {c = stack.current.char_begin_group} then {
-        tk_grp := TK_GROUP.clone.make (stack.current.char_begin_group,
-                                       stack.current.char_end_group);
-        stack.push_copy;
-        tk_grp.install_in (stack.current);
-        tk := read_token;
-        {tk != NULL}.while_do {
-          stack.current.output tk;
-          ((tk_end_grp ?= tk) != NULL).if {
-            // end group, stop loop
-            tk := NULL;
-          } else {
-            tk := read_token;
-          };
-        };
-        stack.pop;
-        tk := tk_grp;
-      }.elseif {c = stack.current.char_end_group} then {
-        tk := TK_END_GROUP.clone.make c;
-      }.elseif {c = stack.current.char_comment} then {
-        s := STRING.create 128;
-        s.add_last c;
-        in.read_line_in s;
-        // Append \n not appended by `read_line_in'
-        (!in.end_of_input).if {
-          s.add_last (in.last_character);
-          in.read_character;
-        };
-        // Append whitespaces except end of line
-        { (!in.end_of_input) &&
-          { (in.last_character = ' ') ||
-            {in.last_character = '\t'}
-          }
-        }.while_do {
-          s.add_last (in.last_character);
-          in.read_character;
-        };
-        // Unread last character that is not a space
-        in.end_of_input.if_false {
-          in.unread_character;
-        };
-        tk := TK_COMMENT.clone.make (s);
-      } else {
-        tk := TK_CHARACTER.clone.make (c);
-      };
-    };
+  + stack  :STACK;
 
-    tk
-  );
-
-  + input_stream :INPUT_STREAM;
-
-  + stack :STACK;
-
-  + last_token :TOKEN;
-
-  - make_input in:INPUT_STREAM stack s:STACK :SELF <-
+  - make_reader rd:READER stack s:STACK :SELF <-
   (
-    input_stream := in;
-    stack        := s;
+    reader := rd;
+    stack  := s;
     Self
   );
 
@@ -134,41 +50,16 @@ Section SELF
 
   - make_from origin:SELF <-
   (
-    make_input (origin.input_stream) stack (origin.stack);
-    last_token := origin.last_token;
-  );
-
-Section Public
-
-  - process_token token:TOKEN <-
-  ( + tk_idf:TK_IDENTIFIER;
-
-    ((tk_idf ?= token) != NULL).if {
-      + macro:MACRO;
-      //
-      // Read identifier (execute macro)
-      //
-      macro := stack.current.definitions.reference_at (tk_idf.name);
-      (macro != NULL).if {
-        macro.execute Self;
-      } else {
-        stack.current.output token;
-      }
-    } else {
-      //
-      // Read any other token and output it directly
-      //
-      stack.current.output token;
-    };
+    make_reader (origin.reader) stack (origin.stack);
   );
 
 Section T5
 
   - process <-
-  (
-    last_token := read_token;
-    (last_token != NULL).if {
-      process_token last_token;
+  ( + token :TOKEN;
+    token := reader.read_token stack;
+    (token != NULL).if {
+      reader.process_token token stack stack;
       process;
     };
   );
