@@ -23,7 +23,7 @@
 
 Section Header
 
-  + name := CLONABLE;
+  + name := MACRO_DYNAMIC;
 
   - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
   - copyright     := "2009 Mildred Ki'Lya";
@@ -31,20 +31,22 @@ Section Header
 
 Section Inherit
 
-  + parent_object :Expanded OBJECT;
+  + parent :Expanded MACRO;
+
+Section Private
+
+  + behaviour :{STATE;};
 
 Section Public
 
-  - clone :SELF <-
-  ( + result :SELF;
-    result := parent_object.clone;
-    result.make_from Self;
-    result
+  - execute state:STATE <-
+  (
+    behaviour.value state;
   );
 
-Section SELF
+  - make b:{STATE;} :SELF <-
+  (
+    behaviour := b;
+    Self
+  );
 
-  - make_from origin:SELF;
-
-// kate: hl Lisaac v0.2; indent-width 2; space-indent on; replace-tabs off;
-// kate: tab-width 8; remove-trailing-space on;

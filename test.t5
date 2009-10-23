@@ -1,5 +1,7 @@
 This is a T5 test
-\def\test{TeSt}
+\def\test{TeSt}%
 \test
+
+% comment
 
 Bye!

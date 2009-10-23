@@ -25,6 +25,14 @@ Section Header
 
   + name := MC_DEF;
 
+  // Usage: \def\idf\content
+  //
+  // If \idf is an identifier, a macro is defined for the current context that
+  // would evaluate \content each time it is called.
+  //
+  // Otherwise, \def is outputted, \idf is processed and \content isn't even
+  // read
+
   - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
   - copyright     := "2009 Mildred Ki'Lya";
   - comment       := "";
@@ -35,5 +43,19 @@ Section Inherit
 
 Section Public
 
-  + execute state:STATE; // nop
+  - execute state:STATE <-
+  ( + idf, content :TOKEN;
+    + idf2 :TK_IDENTIFIER;
+    + mc :MACRO_DEFIMPL;
+
+    idf2 ?= idf := state.read_token;
+
+    (idf2 != NULL).if {
+      content := state.read_token;
+      mc := MACRO_DEFIMPL.clone.make_frame (state.stack.current) token content;
+      state.stack.current.definitions.put mc to (idf2.name);
+    } else {
+      state.process_token idf;
+    };
+  );
 

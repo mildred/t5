@@ -127,36 +127,37 @@ Section SELF
     last_token := origin.last_token;
   );
 
+Section Public
+
+  - process_token token:TOKEN <-
+  ( + tk_idf:TK_IDENTIFIER;
+
+    ((tk_idf ?= token) != NULL).if {
+      + macro:MACRO;
+      //
+      // Read identifier (execute macro)
+      //
+      macro := stack.current.definitions.reference_at (tk_idf.name);
+      (macro != NULL).if {
+        macro.execute Self;
+      } else {
+        stack.current.output token;
+      }
+    } else {
+      //
+      // Read any other token and output it directly
+      //
+      stack.current.output token;
+    };
+  );
+
 Section T5
 
   - process <-
-  ( + tk_idf:TK_IDENTIFIER;
-
+  (
     last_token := read_token;
     (last_token != NULL).if {
-
-      tk_idf ?= last_token;
-      (tk_idf != NULL).if {
-        + macro:MACRO;
-        //
-        // Read identifier (execute macro)
-        //
-        macro := stack.current.definitions.reference_at (tk_idf.name);
-        (macro != NULL).if {
-          macro.execute Self;
-        } else {
-          stack.current.output last_token;
-        }
-      } else {
-        //
-        // Read any other token and output it directly
-        //
-        stack.current.output last_token;
-      };
-
-      //
-      // Recursion
-      //
+      process_token last_token;
       process;
     };
   );

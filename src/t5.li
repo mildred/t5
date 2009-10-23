@@ -49,6 +49,7 @@ Section Public
     stack.current.set_output_behaviour { tk:TOKEN;
       STD_OUTPUT.put_string (tk.output);
     };
+    stack.current.definitions.put MC_DEF to "def";
     state := STATE.clone.make_input STD_INPUT stack stack;
     state.process;
   );
