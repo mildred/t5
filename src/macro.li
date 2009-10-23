@@ -35,7 +35,7 @@ Section Inherit
 
 Section Public
 
-  + execute state:STATE in stack:STACK <- deferred;
+  + execute state:STATE <- deferred;
 
 
 

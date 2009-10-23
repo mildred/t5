@@ -31,16 +31,18 @@ Section Header
 
 Section Inherit
 
-  + parent :Expanded OBJECT;
+  + parent :Expanded CLONABLE;
 
 Section Public
 
-  - read_token_from in:INPUT_STREAM in stack:STACK :TOKEN <-
-  ( + c:CHARACTER;
+  - read_token :TOKEN <-
+  ( + in:INPUT_STREAM;
+    + c:CHARACTER;
     + tk:TOKEN;
     + tk_grp:TK_GROUP;
     + tk_end_grp:TK_END_GROUP;
     + s:STRING;
+    in := input_stream;
     in.read_character;
 
     in.end_of_input.if_false {
@@ -70,14 +72,14 @@ Section Public
                                        stack.current.char_end_group);
         stack.push_copy;
         tk_grp.install_in (stack.current);
-        tk := read_token_from in in stack;
+        tk := read_token;
         {tk != NULL}.while_do {
           stack.current.output tk;
           ((tk_end_grp ?= tk) != NULL).if {
             // end group, stop loop
             tk := NULL;
           } else {
-            tk := read_token_from in in stack;
+            tk := read_token;
           };
         };
         stack.pop;
@@ -104,17 +106,36 @@ Section Public
     tk
   );
 
-  - read_group_from in:INPUT_STREAM :GROUP <- (not_yet_implemented; GROUP);
+  + input_stream :INPUT_STREAM;
+
+  + stack :STACK;
+
+  + last_token :TOKEN;
+
+  - make_input in:INPUT_STREAM stack s:STACK :SELF <-
+  (
+    input_stream := in;
+    stack        := s;
+    Self
+  );
+
+Section SELF
+
+  - make_from origin:SELF <-
+  (
+    make_input (origin.input_stream) stack (origin.stack);
+    last_token := origin.last_token;
+  );
 
 Section T5
 
-  - process in:INPUT_STREAM in stack:STACK <-
-  ( + tk:TOKEN;
-    + tk_idf:TK_IDENTIFIER;
-    tk := read_token_from in in stack;
-    (tk != NULL).if {
-      //"\nRead: ".print; tk.type.print; ' '.print; tk.source.print; '\n'.print;
-      tk_idf ?= tk;
+  - process <-
+  ( + tk_idf:TK_IDENTIFIER;
+
+    last_token := read_token;
+    (last_token != NULL).if {
+
+      tk_idf ?= last_token;
       (tk_idf != NULL).if {
         + macro:MACRO;
         //
@@ -122,22 +143,21 @@ Section T5
         //
         macro := stack.current.definitions.reference_at (tk_idf.name);
         (macro != NULL).if {
-          macro.execute Self in stack;
+          macro.execute Self;
         } else {
-          stack.current.output tk;
+          stack.current.output last_token;
         }
       } else {
         //
         // Read any other token and output it directly
         //
-        stack.current.output tk;
+        stack.current.output last_token;
       };
+
       //
       // Recursion
       //
-      process in in stack;
-    } else {
-      //"TK_NULL".println;
+      process;
     };
   );
 
