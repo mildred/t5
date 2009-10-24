@@ -1,8 +1,29 @@
 This is a T5 test
 
-define rd: \def\rd{beginRD \readToken endRD}
+define rd: \def\rd{beginRD \readToken{raw}{} endRD}
 use rd: \rd\toto
+use rd: \rd\tata
 use rd: \rd{toto}
+
+define rd2: \def\rd2{<RD2>\readToken{all}{}</RD2>}
+use rd2: \rd2\toto
+use rd2: \rd2\rd{TEST_RD}
+use rd2: \rd2{toto}
+
+define rd3: \def\rd3{<RD3>\readToken{3}{}</RD3>}
+use rd3: \rd3\toto
+use rd3: \rd3\rd{TEST_RD}
+use rd3: \rd3\rd2\rd{TEST_RD}
+
+define rd0: \def\rd0{<RD0>\readToken{0}{}</RD0>}
+use rd0: \rd0\toto
+use rd0: \rd0\rd{TEST_RD}
+use rd0: \rd0\rd2\rd{TEST_RD}
+
+define rd01: \def\rd01{<RD01>\readToken{1}{}</RD01>}
+use rd01: \rd01\toto
+use rd01: \rd01\rd{TEST_RD}
+use rd01: \rd01\rd2\rd{TEST_RD}
 
 {
   set var: \set\var{5}

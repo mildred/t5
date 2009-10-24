@@ -47,17 +47,17 @@ Section Public
 
   - is_null :BOOLEAN <- FALSE;
 
-  - make src:ABSTRACT_STRING :SELF <-
+  - make_source src:ABSTRACT_STRING :SELF <-
   (
     source := src;
     Self
   );
 
-Section SELF
+Section CLONABLE
 
   - make_from origin:SELF <-
   (
-    make (origin.source);
+    source := origin.source;
   );
 
 // kate: hl Lisaac v0.2; indent-width 2; space-indent on; replace-tabs off;

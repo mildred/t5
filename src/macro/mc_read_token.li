@@ -25,9 +25,26 @@ Section Header
 
   + name := MC_READ_TOKEN;
 
-  // Usage: \readToken{depth}
+  // Usage: \readToken{num_read}{depth}
+  //        \readToken{all}{depth}
+  //        \readToken{raw}{depth}
   //
-  // Returns the next token at evaluated depth {depth}. Default depth is 1.
+  // Evaluates the first and the second parameter. If the second parameter can
+  // be converted to an integer, this integer is used as a value for the depth
+  // parameter. Otherwise, the depth is 1.
+  //
+  // If the first parameter is:
+  //
+  // - "raw": The next token at specified depth is read and returned
+  //
+  // - "all": The next token at specified depth is read and processed, all
+  //   resulting tokens are returned
+  //
+  // - integer: The next token at specified depth is read and processed,
+  //   `integer` resulting tokens are returned, the others are pushed back for
+  //   further processing.
+  //
+  // - something else: same as if you specify 1
   //
   // Depth 0 read the next token just after \readToken was invoked
   // Depth 1 read the next token after the macro that called \readToken
@@ -46,17 +63,40 @@ Section Public
   - execute_reader reader:READER writer writer:WRITER_STACK stack stack:STACK <-
   ( + rd:READER;
     + tk_out :ABSTRACT_STRING;
-    + depth:INTEGER;
-    + tk:TOKEN;
+    + depth, num_read:INTEGER;
+    + tk, tk_mode, tk_depth:TOKEN;
     + st:STACK;
+    + count :INTEGER;
 
-    tk := reader.read_processed_token stack;
-    tk_out := tk.output;
-    tk_out.is_integer.if {
-      depth := tk_out.to_integer;
-    } else {
-      depth := 1;
-      reader.write_token tk;
+    tk_mode  := reader.read_processed_token stack;
+    tk_depth := reader.read_processed_token stack;
+
+    //tk_mode.debug_output.println;
+    //tk_depth.debug_output.println;
+
+    num_read := 1;
+    (tk_mode != 0).if {
+      tk_out := tk_mode.output;
+      tk_out.is_integer.if {
+        num_read := tk_out.to_integer;
+        (num_read < 0).if {
+          num_read := 0;
+        };
+      }.elseif { tk_out == "raw" } then {
+        num_read := -2;
+      }.elseif { tk_out == "all" } then {
+        num_read := -1;
+      } else {
+        num_read := 1;
+      };
+    };
+
+    depth := 1;
+    (tk_depth != NULL).if {
+      tk_out := tk_depth.output;
+      tk_out.is_integer.if {
+        depth := tk_out.to_integer;
+      };
     };
 
     rd := reader.item_reader depth;
@@ -68,6 +108,47 @@ Section Public
     };
     ? { st.current != NULL };
 
-    writer.write_token (rd.read_token st);
+    tk := rd.read_token st;
+    //tk.debug_output.print;
+
+    (num_read = 0).if {
+      rd.process_token tk writer (WRITER_STACK.clone.make_writer rd) stack st;
+    }.elseif {num_read = -1} then {
+      rd.process_token tk writer writer stack st;
+    }.elseif {num_read = -2} then {
+      writer.write_token tk;
+    }.elseif {num_read > 0} then {
+      count := rd.cache_count;
+      ? { count >= 0 };
+      rd.process_token tk writer (WRITER_STACK.clone.make_writer rd) stack st;
+      count := rd.cache_count - count;
+      count := min(count, num_read);
+      ? { count <= rd.cache_count };
+      1.to count do { i:INTEGER;
+        writer.write_token (rd.read_token st);
+      };
+    };
+  );
+
+Section Private
+
+  - max (a,b :INTEGER) :INTEGER <-
+  ( + result :INTEGER;
+    (a > b).if {
+      result := a;
+    } else {
+      result := b;
+    };
+    result
+  );
+
+  - min (a,b :INTEGER) :INTEGER <-
+  ( + result :INTEGER;
+    (a > b).if {
+      result := b;
+    } else {
+      result := a;
+    };
+    result
   );
 

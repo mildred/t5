@@ -110,7 +110,7 @@ Section Public
     -? { stack.current.reader = Self };
   ]
   ( + tk_idf:TK_IDENTIFIER;
-    + tk_grp:TK_GROUP;
+    + tk_grp, tk_grp2:TK_GROUP;
     + rd_grp:READER_GROUP;
 
     ((tk_idf ?= token) != NULL).if {
@@ -128,12 +128,19 @@ Section Public
       //
       // Read group (execute all elements)
       //
+      //"Process group: ".print; tk_grp.debug_output.println;
+      tk_grp2 := tk_grp.clone;
+      tk_grp2.tokens.clear;
       rd_grp := READER_GROUP.clone.make_parent_reader Self
                                   .make_group tk_grp;
       stack.push_copy;
       stack.current.set_reader rd_grp;
-      rd_grp.process_group stack writer writer;
+      //"Begin process group: ".print; tk_grp.debug_output.println;
+      rd_grp.process_group stack writer
+        (WRITER_STACK.clone.make_writer tk_grp2);
+      //"End process group: ".print; tk_grp2.debug_output.println;
       stack.pop;
+      writer.write_token tk_grp2;
     } else {
       //
       // Read any other token and output it directly

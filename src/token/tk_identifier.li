@@ -43,7 +43,7 @@ Section Public
 
   - make src:ABSTRACT_STRING name n:ABSTRACT_STRING :SELF <-
   (
-    parent_token.make src;
+    parent_token.make_source src;
     name := n;
     Self
   );

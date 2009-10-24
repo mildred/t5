@@ -69,6 +69,7 @@ Section Public
   (
     read_token stack;
     (last_token != NULL).if {
+      //"  Process: ".print; last_token.debug_output.println;
       process_token last_token writer writer stack stack;
       process_group stack writer writer;
     };

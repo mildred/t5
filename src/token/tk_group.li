@@ -44,6 +44,20 @@ Section Public
 
   - type :STRING_CONSTANT := "TK_GROUP";
 
+  - debug_output :ABSTRACT_STRING <-
+  ( + s:STRING;
+    s := STRING.create 0;
+    s.append type;
+    s.add_last start_character;
+    tokens.foreach { tk:TOKEN;
+      s.append " ";
+      s.append (tk.debug_output);
+      s.append " ";
+    };
+    s.add_last stop_character;
+    s
+  );
+
   + start_character :CHARACTER;
   + stop_character  :CHARACTER;
 
@@ -64,17 +78,28 @@ Section Public
   - output :ABSTRACT_STRING <-
   ( + str:STRING;
     str := STRING.create (tokens.count+2);
+    //str.add_last start_character;
     tokens.foreach { tk:TOKEN;
       str.append (tk.output);
     };
+    //str.add_last stop_character;
     str
   );
 
-  - make (start, stop :CHARACTER) :SELF <-
+  - make_group (start, stop :CHARACTER) :SELF <-
   (
     start_character := start;
     stop_character  := stop;
     Self
+  );
+
+  - make_empty_from origin:SELF <-
+  (
+    parent_token.make_from origin;
+    parent_writer.make_from origin;
+    tokens := FAST_ARRAY(TOKEN).create (origin.tokens.count);
+    start_character := origin.start_character;
+    stop_character  := origin.stop_character;
   );
 
   - write_token token:TOKEN <-
@@ -83,15 +108,21 @@ Section Public
     (tk_end_group != NULL).if {
       stop_character := tk_end_group.character;
     } else {
+      //"  Add token to group: ".print; token.debug_output.println;
       tokens.add_last token;
     };
   );
 
-Section SELF
+Section CLONABLE
 
   - make_from origin:SELF <-
   (
-    tokens := origin.tokens.clone;
+    parent_token.make_from origin;
+    parent_writer.make_from origin;
+    tokens := FAST_ARRAY(TOKEN).create (origin.tokens.count);
+    origin.tokens.foreach { tk:TOKEN;
+      tokens.add_last tk;
+    };
     start_character := origin.start_character;
     stop_character  := origin.stop_character;
   );
