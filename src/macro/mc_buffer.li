@@ -23,7 +23,20 @@
 
 Section Header
 
-  + name := T5;
+  + name := MC_BUFFER;
+
+  // Usage: \buffer{nop}
+  //
+  // Push a writer that will discard tokens send to it. Removes any output until
+  // you pop it.
+  //
+  // Usage: \buffer{copy}
+  //
+  // Push a copy of the current writer
+  //
+  // Usage: \buffer{pop}
+  //
+  // Pop the last writer.
 
   - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
   - copyright     := "2009 Mildred Ki'Lya";
@@ -31,38 +44,28 @@ Section Header
 
 Section Inherit
 
-  + parent :Expanded OBJECT;
+  + parent :Expanded MACRO;
 
 Section Public
 
-  - main <-
-  ( + state :STATE;
-    + reader:READER;
-    + writer:WRITER;
-    + stack :STACK;
+  - execute_reader reader:READER writer writer:WRITER_STACK stack stack:STACK <-
+  ( + tk1, tk2 :TOKEN;
+    + op :ABSTRACT_STRING;
 
-    + c:CLONABLE;
-    c := CLONABLE;
-    `/* @c */`;
-    // Force generation of CLONABLE_struct that is an alias of STACK_FRAME. If
-    // We don't have it, the C code generated is incorrect
+    tk1 := reader.last_token;
 
-    stack := STACK.clone;
-    reader := READER_STREAM.clone.make_input STD_INPUT;
-    writer := WRITER_STREAM.clone.make_stream STD_OUTPUT;
+    tk2 := reader.read_processed_token stack;
+    op := tk2.output;
 
-    stack.current.set_reader reader;
-    stack.current.definitions.put MC_DEF to "def";
-    stack.current.definitions.put MC_NOP to "nop";
-    stack.current.definitions.put MC_SET to "set";
-    stack.current.definitions.put MC_BUFFER to "buffer";
-    stack.current.definitions.put MC_BACKSLASH to "\\";
-    stack.current.definitions.put MC_READ_TOKEN to "readToken";
-
-    state := STATE.clone.make_reader reader writer writer stack stack;
-    state.process;
+    (op == "pop").if {
+      writer.pop;
+    }.elseif { op == "nop"} then {
+      writer.push WRITER_NOP;
+    }.elseif { op == "copy"} then {
+      writer.push (writer.current.clone.make_parent_writer NULL);
+    } else {
+      writer.write_token tk1;
+      reader.write_token tk2;
+    };
   );
 
-
-// kate: hl Lisaac v0.2; indent-width 2; space-indent on; replace-tabs off;
-// kate: tab-width 8; remove-trailing-space on;

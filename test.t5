@@ -1,5 +1,7 @@
 This is a T5 test
 
+\buffer{nop}
+
 Backshash: \\
 
 define rd: \def\rd{beginRD \readToken{raw}{} endRD}
@@ -45,6 +47,8 @@ use rd01: \rd01\rd2\rd{TEST_RD}
   use in group: \test
 }
 use out of group: \test
+
+\buffer{pop}
 
 % comment
 

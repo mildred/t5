@@ -31,9 +31,9 @@ Section Header
 
 Section Inherit
 
-  + parent_token :Expanded TOKEN := TOKEN;
+  + parent_inherit_token :Expanded TOKEN := TOKEN;
 
-  + parent_writer :Expanded WRITER := WRITER;
+  + parent_inherit_writer :Expanded WRITER := WRITER;
 
 Section Private
 
@@ -95,8 +95,8 @@ Section Public
 
   - make_empty_from origin:SELF <-
   (
-    parent_token.make_from origin;
-    parent_writer.make_from origin;
+    parent_inherit_token.make_from origin;
+    parent_inherit_writer.make_from origin;
     tokens := FAST_ARRAY(TOKEN).create (origin.tokens.count);
     start_character := origin.start_character;
     stop_character  := origin.stop_character;
@@ -117,8 +117,8 @@ Section CLONABLE
 
   - make_from origin:SELF <-
   (
-    parent_token.make_from origin;
-    parent_writer.make_from origin;
+    parent_inherit_token.make_from origin;
+    parent_inherit_writer.make_from origin;
     tokens := FAST_ARRAY(TOKEN).create (origin.tokens.count);
     origin.tokens.foreach { tk:TOKEN;
       tokens.add_last tk;
