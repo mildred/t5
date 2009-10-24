@@ -136,7 +136,7 @@ Section Public
       stack.push_copy;
       stack.current.set_reader rd_grp;
       //"Begin process group: ".print; tk_grp.debug_output.println;
-      rd_grp.process_group stack writer
+      rd_grp.process_all stack writer
         (WRITER_STACK.clone.make_writer tk_grp2);
       //"End process group: ".print; tk_grp2.debug_output.println;
       stack.pop;
@@ -146,6 +146,19 @@ Section Public
       // Read any other token and output it directly
       //
       writer.write_token token;
+    };
+  );
+
+
+  - process_all stack:STACK writer writer:WRITER_STACK <-
+  [
+    -? { stack.current.reader = Self };
+  ]
+  ( + token :TOKEN;
+    token := read_token stack;
+    (token != NULL).if {
+      process_token token writer writer stack stack;
+      process_all stack writer writer;
     };
   );
 

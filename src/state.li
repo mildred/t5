@@ -62,12 +62,8 @@ Section SELF
 Section T5
 
   - process <-
-  ( + token :TOKEN;
-    token := reader.read_token stack;
-    (token != NULL).if {
-      reader.process_token token writer writer stack stack;
-      process;
-    };
+  (
+    reader.process_all stack writer writer;
   );
 
 

@@ -36,7 +36,7 @@ Section Inherit
 Section Public
 
   - main <-
-  ( + state :STATE;
+  ( //+ state :STATE;
     + reader:READER;
     + writer:WRITER;
     + stack :STACK;
@@ -55,12 +55,15 @@ Section Public
     stack.current.definitions.put MC_DEF to "def";
     stack.current.definitions.put MC_NOP to "nop";
     stack.current.definitions.put MC_SET to "set";
+    stack.current.definitions.put MC_INPUT to "input";
     stack.current.definitions.put MC_BUFFER to "buffer";
     stack.current.definitions.put MC_BACKSLASH to "\\";
     stack.current.definitions.put MC_READ_TOKEN to "readToken";
 
-    state := STATE.clone.make_reader reader writer writer stack stack;
-    state.process;
+    reader.process_all stack writer (WRITER_STACK.clone.make_writer writer);
+
+    //state := STATE.clone.make_reader reader writer writer stack stack;
+    //state.process;
   );
 
 

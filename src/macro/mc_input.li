@@ -23,7 +23,11 @@
 
 Section Header
 
-  + name := READER_GROUP;
+  + name := MC_INPUT;
+
+  // Usage: \input{filename}
+  //
+  // Process tokens from file `filename'
 
   - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
   - copyright     := "2009 Mildred Ki'Lya";
@@ -31,57 +35,45 @@ Section Header
 
 Section Inherit
 
-  + parent_inherit_reader :Expanded READER;
-
-Section SELF
-
-  - raw_read_token stack:STACK :TOKEN <-
-  ( + tk:TOKEN;
-
-    (index <= group.tokens.upper).if {
-      tk := group.tokens.item index;
-      index := index + 1;
-    };
-
-    tk
-  );
+  + parent :Expanded MACRO;
 
 Section Public
 
-  + group :TK_GROUP;
+  - execute_reader reader:READER writer writer:WRITER_STACK stack stack:STACK <-
+  ( + tk :TOKEN;
+    + fn :ABSTRACT_STRING;
+    + rd :READER;
+    + file :STD_FILE;
+    + stream :INPUT_STREAM;
+    + ok :BOOLEAN;
 
-  + index :INTEGER;
+    tk := reader.read_processed_token stack;
+    fn := tk.output;
 
-  - make_group grp:TK_GROUP :SELF <-
-  [
-    -? { grp != NULL };
-  ]
-  (
-    group := grp;
-    index := grp.tokens.lower;
-    Self
-  );
+    file ?= FILE_SYSTEM.get_entry fn;
+    (file != NULL).if {
+      ok := file.open_read_only;
+    };
+    ok.if {
+      stream := FILE_INPUT_STREAM.create file;
+      rd := READER_STREAM.make_input stream;
 
-  /*
-  - process_group stack:STACK writer writer:WRITER_STACK <-
-  [
-    -? { stack.current.reader = Self };
-  ]
-  (
-    read_token stack;
-    (last_token != NULL).if {
-      //"  Process: ".print; last_token.debug_output.println;
-      process_token last_token writer writer stack stack;
-      process_group stack writer writer;
+      stack.push_copy;
+      stack.current.set_reader rd;
+      rd.process_all stack writer writer;
+      stack.pop;
+    } else {
+      writer.write_token (
+        + tk_grp :TK_GROUP;
+        + error :STRING;
+        tk_grp := TK_GROUP.clone.make_group (stack.current.char_begin_group,
+                                             stack.current.char_end_group);
+        error := "File `"+fn+"' not readable";
+        error.lower.to (error.upper) do { i:INTEGER;
+          tk_grp.write_token (TK_CHARACTER.clone.make (error.item i));
+        };
+        tk_grp
+      );
     };
   );
-  */
 
-Section CLONABLE
-
-  - make_from origin:SELF <-
-  (
-    parent_inherit_reader.make_from origin;
-    group      := origin.group;
-    index      := origin.index;
-  );

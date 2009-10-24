@@ -52,4 +52,7 @@ use out of group: \test
 
 % comment
 
+input test2.t5: \input{test2.t5}
+
+
 Bye!
