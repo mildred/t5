@@ -45,7 +45,7 @@ Section Public
 
   - current :WRITER <- writer;
 
-  - output token:TOKEN <-
+  - write_token token:TOKEN <-
   [
     -? {current != NULL };
   ]

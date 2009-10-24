@@ -46,14 +46,16 @@ Section Public
     `/* @c */`;
     // Force generation of CLONABLE_struct that is an alias of STACK_FRAME. If
     // We don't have it, the C code generated is incorrect
-    
+
+    stack := STACK.clone;
     reader := READER_STREAM.clone.make_input STD_INPUT;
     writer := WRITER_STREAM.clone.make_stream STD_OUTPUT;
-    stack := STACK.clone;
 
+    stack.current.set_reader reader;
     stack.current.definitions.put MC_DEF to "def";
     stack.current.definitions.put MC_NOP to "nop";
     stack.current.definitions.put MC_SET to "set";
+    stack.current.definitions.put MC_READ_TOKEN to "readToken";
 
     state := STATE.clone.make_reader reader writer writer stack stack;
     state.process;

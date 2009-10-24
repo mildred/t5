@@ -44,11 +44,21 @@ Section Private
 
 Section Public
 
-  - current :STACK_FRAME <- frames.last;
+  - item i:INTEGER :STACK_FRAME <-
+  ( + j:INTEGER;
+    + result :STACK_FRAME;
+    j := frames.upper - i;
+    (j >= frames.lower).if {
+      result := frames.item j;
+    };
+    result
+  );
 
-  - push s:STACK_FRAME   <- frames.add_last s;
+  - current   :STACK_FRAME <- frames.last;
 
-  - push_copy            <- push (current.clone);
+  - push     s:STACK_FRAME <- frames.add_last s;
+
+  - push_copy :STACK_FRAME <- (push (current.clone); current);
 
   - pop     :STACK_FRAME <-
   ( + result :STACK_FRAME;

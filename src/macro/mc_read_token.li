@@ -23,7 +23,15 @@
 
 Section Header
 
-  + name := READER_GROUP;
+  + name := MC_READ_TOKEN;
+
+  // Usage: \readToken{depth}
+  //
+  // Returns the next token at evaluated depth {depth}. Default depth is 1.
+  //
+  // Depth 0 read the next token just after \readToken was invoked
+  // Depth 1 read the next token after the macro that called \readToken
+  // ...
 
   - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
   - copyright     := "2009 Mildred Ki'Lya";
@@ -31,54 +39,35 @@ Section Header
 
 Section Inherit
 
-  + parent_inherit_reader :Expanded READER;
-
-Section SELF
-
-  - raw_read_token stack:STACK :TOKEN <-
-  ( + tk:TOKEN;
-
-    (index <= group.tokens.upper).if {
-      tk := group.tokens.item index;
-      index := index + 1;
-    };
-
-    tk
-  );
+  + parent :Expanded MACRO;
 
 Section Public
 
-  + group :TK_GROUP;
+  - execute_reader reader:READER writer writer:WRITER_STACK stack stack:STACK <-
+  ( + rd:READER;
+    + tk_out :ABSTRACT_STRING;
+    + depth:INTEGER;
+    + tk:TOKEN;
+    + st:STACK;
 
-  + index :INTEGER;
-
-  - make_group grp:TK_GROUP :SELF <-
-  [
-    -? { grp != NULL };
-  ]
-  (
-    group := grp;
-    index := grp.tokens.lower;
-    Self
-  );
-
-  - process_group stack:STACK writer writer:WRITER_STACK <-
-  [
-    -? { stack.current.reader = Self };
-  ]
-  (
-    read_token stack;
-    (last_token != NULL).if {
-      process_token last_token writer writer stack stack;
-      process_group stack writer writer;
+    tk := reader.read_processed_token stack;
+    tk_out := tk.output;
+    tk_out.is_integer.if {
+      depth := tk_out.to_integer;
+    } else {
+      depth := 1;
+      reader.write_token tk;
     };
+
+    rd := reader.item_reader depth;
+
+    // TODO: check this
+    st := stack.clone;
+    {(st.current != NULL) && {st.current.reader != rd}}.while_do {
+      st.pop;
+    };
+    ? { st.current != NULL };
+
+    writer.write_token (rd.read_token st);
   );
 
-Section CLONABLE
-
-  - make_from origin:SELF <-
-  (
-    parent_inherit_reader.make_from origin;
-    group      := origin.group;
-    index      := origin.index;
-  );

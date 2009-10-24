@@ -1,5 +1,9 @@
 This is a T5 test
 
+define rd: \def\rd{beginRD \readToken endRD}
+use rd: \rd\toto
+use rd: \rd{toto}
+
 {
   set var: \set\var{5}
   use var: \var

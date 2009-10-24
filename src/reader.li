@@ -51,12 +51,28 @@ Section Public
     Self
   );
 
+  - item_reader i:INTEGER :READER <-
+  [
+    -? { i >= 0 };
+  ]
+  ( + result :READER;
+    (i = 0).if {
+      result := Self;
+    }.elseif {parent_reader != NULL} then {
+      result := parent_reader.item_reader (i-1);
+    };
+    result
+  );
+
   - write_token token:TOKEN <-
   (
     push_back.add_last token;
   );
 
   - read_token stack:STACK :TOKEN <-
+  [
+    -? { stack.current.reader = Self };
+  ]
   (
     push_back.is_empty.if_false {
       last_token := push_back.first;
@@ -72,6 +88,9 @@ Section Public
   + last_token :TOKEN;
 
   - read_processed_token stack:STACK :TOKEN <-
+  [
+    -? { stack.current.reader = Self };
+  ]
   ( + old_cache_count :INTEGER;
     + result :TOKEN;
     + writer :WRITER_STACK;
@@ -87,6 +106,9 @@ Section Public
   );
 
   - process_token token:TOKEN writer writer:WRITER_STACK stack stack:STACK <-
+  [
+    -? { stack.current.reader = Self };
+  ]
   ( + tk_idf:TK_IDENTIFIER;
     + tk_grp:TK_GROUP;
     + rd_grp:READER_GROUP;
@@ -100,21 +122,23 @@ Section Public
       (macro != NULL).if {
         macro.execute_reader Self writer writer stack stack;
       } else {
-        writer.output token;
+        writer.write_token token;
       }
     }.elseif {(tk_grp ?= token) != NULL} then {
       //
       // Read group (execute all elements)
       //
-      rd_grp := READER_GROUP.clone.make_group tk_grp.make_parent_reader Self;
+      rd_grp := READER_GROUP.clone.make_parent_reader Self
+                                  .make_group tk_grp;
       stack.push_copy;
+      stack.current.set_reader rd_grp;
       rd_grp.process_group stack writer writer;
       stack.pop;
     } else {
       //
       // Read any other token and output it directly
       //
-      writer.output token;
+      writer.write_token token;
     };
   );
 

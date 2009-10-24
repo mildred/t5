@@ -43,10 +43,23 @@ Section Public
   + definitions :HASHED_DICTIONARY(MACRO,ABSTRACT_STRING) :=
     HASHED_DICTIONARY(MACRO,ABSTRACT_STRING).create;
 
+  + reader :READER;
+
+  - set_reader r:READER :SELF <-
+  (
+    reader := r;
+    Self
+  );
+
 Section SELF
 
   - make_from origin:SELF <-
   (
+    char_escape      := origin.char_escape;
+    char_begin_group := origin.char_begin_group;
+    char_end_group   := origin.char_end_group;
+    char_comment     := origin.char_comment;
+    reader           := origin.reader;
     definitions := HASHED_DICTIONARY(MACRO,ABSTRACT_STRING).create;
     origin.definitions.foreach_pair { (k:ABSTRACT_STRING, v:MACRO);
       definitions.put v to k;
