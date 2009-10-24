@@ -1,5 +1,7 @@
 This is a T5 test
 
+Backshash: \\
+
 define rd: \def\rd{beginRD \readToken{raw}{} endRD}
 use rd: \rd\toto
 use rd: \rd\tata

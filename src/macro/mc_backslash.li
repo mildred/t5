@@ -23,7 +23,11 @@
 
 Section Header
 
-  + name := T5;
+  + name := MC_BACKSLASH;
+
+  // Usage: \\
+  //
+  // Output the character '\'
 
   - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
   - copyright     := "2009 Mildred Ki'Lya";
@@ -31,37 +35,12 @@ Section Header
 
 Section Inherit
 
-  + parent :Expanded OBJECT;
+  + parent :Expanded MACRO;
 
 Section Public
 
-  - main <-
-  ( + state :STATE;
-    + reader:READER;
-    + writer:WRITER;
-    + stack :STACK;
-
-    + c:CLONABLE;
-    c := CLONABLE;
-    `/* @c */`;
-    // Force generation of CLONABLE_struct that is an alias of STACK_FRAME. If
-    // We don't have it, the C code generated is incorrect
-
-    stack := STACK.clone;
-    reader := READER_STREAM.clone.make_input STD_INPUT;
-    writer := WRITER_STREAM.clone.make_stream STD_OUTPUT;
-
-    stack.current.set_reader reader;
-    stack.current.definitions.put MC_DEF to "def";
-    stack.current.definitions.put MC_NOP to "nop";
-    stack.current.definitions.put MC_SET to "set";
-    stack.current.definitions.put MC_READ_TOKEN to "readToken";
-    stack.current.definitions.put MC_BACKSLASH to "\\";
-
-    state := STATE.clone.make_reader reader writer writer stack stack;
-    state.process;
+  - execute_reader reader:READER writer writer:WRITER_STACK stack stack:STACK <-
+  (
+    writer.write_token (TK_CHARACTER.clone.make '\\');
   );
 
-
-// kate: hl Lisaac v0.2; indent-width 2; space-indent on; replace-tabs off;
-// kate: tab-width 8; remove-trailing-space on;
