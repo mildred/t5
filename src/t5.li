@@ -53,6 +53,7 @@ Section Public
 
     stack.current.set_reader reader;
     stack.current.definitions.put MC_IF to "if";
+    stack.current.definitions.put MC_EQ to "eq";
     stack.current.definitions.put MC_DEF to "def";
     stack.current.definitions.put MC_NOP to "nop";
     stack.current.definitions.put MC_SET to "set";

@@ -37,6 +37,8 @@ Section Public
 
   - is_true :BOOLEAN <- TRUE;
 
+  - Self:SELF '==' other:SELF :BOOLEAN <- name == other.name;
+
   - type :STRING_CONSTANT := "TK_IDENTIFIER";
 
   + name :ABSTRACT_STRING;

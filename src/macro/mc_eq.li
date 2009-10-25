@@ -23,49 +23,32 @@
 
 Section Header
 
-  + name := TOKEN;
+  + name := MC_EQ;
+
+  // Usage: \eq{tk1}{tk2}
+  //
+  // Test if processed token tk1 and tk2 are equal
 
   - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
   - copyright     := "2009 Mildred Ki'Lya";
   - comment       := "";
 
-//   - default       := TK_NULL;
-
 Section Inherit
 
-  + parent :Expanded CLONABLE;
+  + parent :Expanded MACRO;
 
 Section Public
 
-  - type :STRING_CONSTANT := "TOKEN";
+  - execute_reader reader:READER writer writer:WRITER_STACK stack stack:STACK <-
+  ( + tk1, tk2 :TOKEN;
 
-  - is_true :BOOLEAN <- (deferred; BOOLEAN);
+    tk1 := reader.read_processed_token stack;
+    tk2 := reader.read_processed_token stack;
 
-  - Self:SELF '==' other:SELF :BOOLEAN <-
-  (
-    (type = other.type) && {source == other.source}
+    (tk1 == tk2).if {
+      reader.write_token (TK_CHARACTER.clone.make '1');
+    } else {
+      reader.write_token (TK_CHARACTER.clone.make '0');
+    };
   );
 
-  + source :ABSTRACT_STRING;
-
-  - output :ABSTRACT_STRING <- source;
-
-  - debug_output :ABSTRACT_STRING <- ( type + "<" + source + ">" );
-
-  - is_null :BOOLEAN <- FALSE;
-
-  - make_source src:ABSTRACT_STRING :SELF <-
-  (
-    source := src;
-    Self
-  );
-
-Section CLONABLE
-
-  - make_from origin:SELF <-
-  (
-    source := origin.source;
-  );
-
-// kate: hl Lisaac v0.2; indent-width 2; space-indent on; replace-tabs off;
-// kate: tab-width 8; remove-trailing-space on;

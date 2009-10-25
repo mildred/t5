@@ -37,6 +37,8 @@ Section Public
 
   - is_true :BOOLEAN <- FALSE;
 
+  - Self:SELF '==' other:SELF :BOOLEAN <- TRUE;
+
   - type :STRING_CONSTANT := "TK_NULL";
 
   - source :ABSTRACT_STRING <- "";

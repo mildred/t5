@@ -42,6 +42,8 @@ Section Public
 
   - is_true :BOOLEAN <- (character != '\0') & (character != '0');
 
+  - Self:SELF '==' other:SELF :BOOLEAN <- character = other.character;
+
   - type :STRING_CONSTANT := "TK_CHARACTER";
 
   + character :CHARACTER;

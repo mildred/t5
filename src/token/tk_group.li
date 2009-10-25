@@ -48,6 +48,19 @@ Section Public
     {(tokens.count = 1) && {tokens.first.is_true}}
   );
 
+  - Self:SELF '==' other:SELF :BOOLEAN <-
+  ( + result :BOOLEAN;
+    + i :INTEGER;
+    result := (start_character = other.start_character) &&
+              {stop_character  = other.stop_character } ;
+    i := tokens.lower;
+    {(result) && {i <= tokens.upper}}.while_do {
+      result := tokens.item i == other.tokens.item i;
+      i := i + 1;
+    };
+    result
+  );
+
   - type :STRING_CONSTANT := "TK_GROUP";
 
   - debug_output :ABSTRACT_STRING <-
