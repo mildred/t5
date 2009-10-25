@@ -60,7 +60,7 @@ Section Public
     (op == "pop").if {
       writer.pop;
     }.elseif { op == "nop"} then {
-      writer.push WRITER_NOP;
+      writer.push (WRITER_NOP.clone);
     }.elseif { op == "copy"} then {
       writer.push (writer.current.clone.make_parent_writer NULL);
     } else {

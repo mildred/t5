@@ -44,7 +44,6 @@ Section Public
     + fn :ABSTRACT_STRING;
     + rd :READER;
     + file :STD_FILE;
-    + stream :INPUT_STREAM;
     + ok :BOOLEAN;
 
     tk := reader.read_processed_token stack;
@@ -55,9 +54,7 @@ Section Public
       ok := file.open_read_only;
     };
     ok.if {
-      stream := FILE_INPUT_STREAM.create file;
-      rd := READER_STREAM.make_input stream;
-
+      rd := READER_STREAM.clone.make_input (FILE_INPUT_STREAM.create file);
       stack.push_copy;
       stack.current.set_reader rd;
       rd.process_all stack writer writer;
@@ -75,5 +72,8 @@ Section Public
         tk_grp
       );
     };
-  );
+  )
+  [
+    +? { stack.current = Old stack.current };
+  ];
 
