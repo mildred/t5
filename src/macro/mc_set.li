@@ -26,6 +26,7 @@ Section Header
   + name := MC_SET;
 
   // Usage: \set\idf\evaluatedContent
+  //        \set{level}\idf\evaluatedContent
   //
   // If \idf is an identifier, \evaluatedContent is evaluated. If it results in
   // no tokens, the macro \idf is unset, else the macro \idf is defined as a
@@ -33,6 +34,9 @@ Section Header
   //
   // Otherwise (\idf not an identifier), \def is outputted, \idf is processed
   // and \evaluatedContent isn't even read
+  //
+  // If level is specified (defautl level 0), the definition happens at the
+  // stack level specified
 
   - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
   - copyright     := "2009 Mildred Ki'Lya";
@@ -48,17 +52,37 @@ Section Public
   ( + idf, content :TOKEN;
     + idf2 :TK_IDENTIFIER;
     + mc :MACRO_VARIABLE;
+    + out :ABSTRACT_STRING;
+    + level :INTEGER;
 
     idf2 ?= idf := reader.read_token stack;
+
+    (idf2 = NULL).if {
+      out := idf.output;
+      out.is_integer.if {
+        level := out.to_integer;
+        idf2 ?= idf := reader.read_token stack;
+      };
+    };
 
     (idf2 != NULL).if {
 
       content := reader.read_processed_token stack;
       (content = NULL).if {
         stack.current.definitions.remove (idf2.name);
+        1.to level do { i:INTEGER;
+          (stack.item i != NULL).if {
+            stack.item i.definitions.remove (idf2.name);
+          };
+        };
       } else {
         mc := MACRO_VARIABLE.clone.make_token content;
         stack.current.definitions.put mc to (idf2.name);
+        1.to level do { i:INTEGER;
+          (stack.item i != NULL).if {
+            stack.item i.definitions.put mc to (idf2.name);
+          };
+        };
       };
 
     } else {
