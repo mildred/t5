@@ -35,6 +35,8 @@ Section Inherit
 
 Section Public
 
+  - is_true :BOOLEAN <- FALSE;
+
   - type :STRING_CONSTANT := "TK_COMMENT";
 
   - output :ABSTRACT_STRING <- "";

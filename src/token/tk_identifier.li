@@ -35,6 +35,8 @@ Section Inherit
 
 Section Public
 
+  - is_true :BOOLEAN <- TRUE;
+
   - type :STRING_CONSTANT := "TK_IDENTIFIER";
 
   + name :ABSTRACT_STRING;

@@ -54,5 +54,8 @@ use out of group: \test
 
 input test2.t5: \input{test2.t5}
 
+test if true:  \if{1}{true}\else{false}
+test if false: \if{0}{true}\else{false}
+test if false: \if{}{true}\else{false}
 
 Bye!

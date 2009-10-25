@@ -42,6 +42,12 @@ Section Private
 
 Section Public
 
+  - is_true :BOOLEAN <-
+  (
+    (tokens.count > 1) ||
+    {(tokens.count = 1) && {tokens.first.is_true}}
+  );
+
   - type :STRING_CONSTANT := "TK_GROUP";
 
   - debug_output :ABSTRACT_STRING <-

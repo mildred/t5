@@ -23,44 +23,46 @@
 
 Section Header
 
-  + name := TOKEN;
+  + name := MC_IF;
+
+  // Usage: \if{condition}{true_block}
+  //        \if{condition}{true_block}\else{false_block}
 
   - author        := "Mildred Ki'Lya <http://ki.lya.online.fr>";
   - copyright     := "2009 Mildred Ki'Lya";
   - comment       := "";
 
-//   - default       := TK_NULL;
-
 Section Inherit
 
-  + parent :Expanded CLONABLE;
+  + parent :Expanded MACRO;
 
 Section Public
 
-  - type :STRING_CONSTANT := "TOKEN";
+  - execute_reader reader:READER writer writer:WRITER_STACK stack stack:STACK <-
+  ( + tk_cond, tk_true, tk_else, tk_false :TOKEN;
+    + idf_else :TK_IDENTIFIER;
+    + has_else :BOOLEAN;
 
-  - is_true :BOOLEAN <- (deferred; BOOLEAN);
+    tk_cond := reader.read_processed_token stack;
+    tk_true := reader.read_token stack;
+    tk_else := reader.read_token stack;
 
-  + source :ABSTRACT_STRING;
+    idf_else ?= tk_else;
+    (has_else := (idf_else != NULL) && {idf_else.name == "else"}).if {
+      tk_false := reader.read_token stack;
+    } else {
+      reader.write_token tk_else;
+    };
 
-  - output :ABSTRACT_STRING <- source;
+    tk_cond.is_true.if {
+      (tk_true != NULL).if {
+        reader.process_token tk_true writer writer stack stack;
+      };
+    } else {
+      (tk_false != NULL).if {
+        reader.process_token tk_false writer writer stack stack;
+      };
+    };
 
-  - debug_output :ABSTRACT_STRING <- ( type + "<" + source + ">" );
-
-  - is_null :BOOLEAN <- FALSE;
-
-  - make_source src:ABSTRACT_STRING :SELF <-
-  (
-    source := src;
-    Self
   );
 
-Section CLONABLE
-
-  - make_from origin:SELF <-
-  (
-    source := origin.source;
-  );
-
-// kate: hl Lisaac v0.2; indent-width 2; space-indent on; replace-tabs off;
-// kate: tab-width 8; remove-trailing-space on;
